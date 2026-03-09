@@ -1,11 +1,15 @@
 import { appApi } from "./appApi";
-import { LoginRequest, LoginResponse } from "@/types/auth";
+import {
+  LoginRequest,
+  LoginResponse,
+  FirebaseLoginRequest,
+} from "@/types/auth";
 
 export const authApi = appApi.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    loginWithFirebase: builder.mutation<LoginResponse, FirebaseLoginRequest>({
       query: (body) => ({
-        url: "/auth/login",
+        url: "/auth/firebase",
         method: "POST",
         body,
       }),
@@ -13,4 +17,4 @@ export const authApi = appApi.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginWithFirebaseMutation } = authApi;

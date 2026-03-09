@@ -1,21 +1,53 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Facebook } from "lucide-react";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
+import { useLoginWithFirebaseMutation } from "@/services/authApi";
+import { useRouter } from "next/navigation";
+import { setCredentials } from "@/store/slices/authSlice";
+import { useDispatch } from "react-redux";
 
 export default function LoginForm() {
+  const [loginWithFirebase, { isLoading }] = useLoginWithFirebaseMutation();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const router = useRouter();
+  const dispatch = useDispatch();
+
+  const handleGoogleLogin = async () => {
+    setIsGoogleLoading(true);
+    try {
+      // Sign in with Google through Firebase
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+      const response = await loginWithFirebase({
+        idToken,
+      }).unwrap();
+      dispatch(setCredentials(response));
+      router.push("/dashboard");
+      console.log("Login successful:", response);
+    } catch (error) {
+      console.error("Google login failed:", error);
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-4 w-full max-w-sm">
       {/* Nút đăng nhập Google */}
       <button
         type="button"
-        className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-3.5 rounded-2xl hover:bg-slate-50 hover:shadow-md transition-all font-semibold text-slate-700 active:scale-[0.98]"
+        onClick={handleGoogleLogin}
+        disabled={isGoogleLoading || isLoading}
+        className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 py-3.5 rounded-2xl hover:bg-slate-50 hover:shadow-md transition-all font-semibold text-slate-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <img
           src="https://www.svgrepo.com/show/475656/google-color.svg"
           className="w-5 h-5"
           alt="google"
         />
-        Tiếp tục với Google
+        {isGoogleLoading || isLoading ? "Đang xử lý..." : "Tiếp tục với Google"}
       </button>
 
       {/* Nút đăng nhập Facebook */}
