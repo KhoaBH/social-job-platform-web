@@ -1,9 +1,9 @@
-import { appApi } from "./appApi";
+import { appApi } from "../../lib/appApi";
 import {
   LoginRequest,
   LoginResponse,
   FirebaseLoginRequest,
-} from "@/types/auth";
+} from "./auth";
 
 export const authApi = appApi.injectEndpoints({
   endpoints: (builder) => ({

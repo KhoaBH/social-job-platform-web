@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Facebook } from "lucide-react";
 import { signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
-import { useLoginWithFirebaseMutation } from "@/services/authApi";
+import { useLoginWithFirebaseMutation } from "@/features/auth/authApi";
 import { useRouter } from "next/navigation";
 import { setCredentials } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
