@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { UserCheck, UserPlus, Check, Plus, ArrowRight, Users } from "lucide-react";
+import {
+  UserCheck,
+  UserPlus,
+  Check,
+  Plus,
+  ArrowRight,
+  Users,
+} from "lucide-react";
 import { mockConnections, mockInterests } from "../../data/profileMockData";
 
 const INTEREST_TABS = ["Công ty", "Nhóm", "Bản tin"];
@@ -14,27 +21,28 @@ export default function NetworkTab() {
 
   const toggleConnect = (id: number) =>
     setConnected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
 
   const toggleFollow = (id: number) =>
     setInterests((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, following: !i.following } : i))
+      prev.map((i) => (i.id === id ? { ...i, following: !i.following } : i)),
     );
 
   return (
     <div className="animate-[fadeIn_0.2s_ease]">
       <div className="grid grid-cols-[1fr_300px] gap-4 max-[900px]:grid-cols-1">
-
         {/* ── Main column ── */}
         <div className="flex flex-col gap-3">
-
           {/* Connections grid */}
           <section className="bg-white rounded-2xl p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <h2
                 className="text-lg text-gray-900"
-                style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400 }}
+                style={{
+                  fontFamily: "'DM Serif Display', serif",
+                  fontWeight: 400,
+                }}
               >
                 Kết nối ({mockConnections.length})
               </h2>
@@ -61,7 +69,9 @@ export default function NetworkTab() {
                   >
                     {person.name}
                   </Link>
-                  <div className="text-[11.5px] text-gray-500 leading-snug">{person.role}</div>
+                  <div className="text-[11.5px] text-gray-500 leading-snug">
+                    {person.role}
+                  </div>
                   <div className="flex items-center gap-1 text-[11px] text-gray-400">
                     <Users size={11} />
                     {person.mutual} kết nối chung
@@ -69,15 +79,21 @@ export default function NetworkTab() {
                   <button
                     onClick={() => toggleConnect(person.id)}
                     className={`mt-2 flex items-center gap-1 px-3.5 py-1 rounded-full text-[12px] font-semibold border-[1.5px] cursor-pointer transition-all
-                                ${connected.includes(person.id)
-                                  ? "bg-gray-100 border-gray-300 text-gray-500"
-                                  : "border-violet-600 text-violet-600 bg-transparent hover:bg-violet-600 hover:text-white"
+                                ${
+                                  connected.includes(person.id)
+                                    ? "bg-gray-100 border-gray-300 text-gray-500"
+                                    : "border-violet-600 text-violet-600 bg-transparent hover:bg-violet-600 hover:text-white"
                                 }`}
                   >
-                    {connected.includes(person.id)
-                      ? <><Check size={12} /> Đã kết nối</>
-                      : <><UserPlus size={12} /> Kết nối</>
-                    }
+                    {connected.includes(person.id) ? (
+                      <>
+                        <Check size={12} /> Đã kết nối
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus size={12} /> Kết nối
+                      </>
+                    )}
                   </button>
                 </div>
               ))}
@@ -89,7 +105,10 @@ export default function NetworkTab() {
             <div className="flex items-center justify-between mb-3">
               <h2
                 className="text-lg text-gray-900"
-                style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400 }}
+                style={{
+                  fontFamily: "'DM Serif Display', serif",
+                  fontWeight: 400,
+                }}
               >
                 Mối quan tâm
               </h2>
@@ -102,9 +121,10 @@ export default function NetworkTab() {
                   key={tab}
                   onClick={() => setActiveIntTab(tab)}
                   className={`px-4 py-1 rounded-full text-[12.5px] font-medium border-none cursor-pointer transition-all
-                              ${activeIntTab === tab
-                                ? "bg-violet-600 text-white"
-                                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                              ${
+                                activeIntTab === tab
+                                  ? "bg-violet-600 text-white"
+                                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
                               }`}
                 >
                   {tab}
@@ -120,7 +140,7 @@ export default function NetworkTab() {
                   className="flex items-center gap-3 py-3 border-b border-gray-100 last:border-b-0"
                 >
                   <div
-                    className="w-10.5 h-10.5 rounded-xl flex items-center justify-center text-[15px] font-extrabold text-white shrink-0"
+                    className="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-[15px] font-extrabold text-white shrink-0"
                     style={{ background: item.color }}
                   >
                     {item.logo}
@@ -133,20 +153,28 @@ export default function NetworkTab() {
                     >
                       {item.name}
                     </Link>
-                    <div className="text-[12px] text-gray-400">{item.followers} người theo dõi</div>
+                    <div className="text-[12px] text-gray-400">
+                      {item.followers} người theo dõi
+                    </div>
                   </div>
                   <button
                     onClick={() => toggleFollow(item.id)}
                     className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[12.5px] font-semibold border-[1.5px] cursor-pointer transition-all whitespace-nowrap
-                                ${item.following
-                                  ? "bg-violet-600 text-white border-violet-600"
-                                  : "border-violet-600 text-violet-600 bg-transparent hover:bg-violet-600 hover:text-white"
+                                ${
+                                  item.following
+                                    ? "bg-violet-600 text-white border-violet-600"
+                                    : "border-violet-600 text-violet-600 bg-transparent hover:bg-violet-600 hover:text-white"
                                 }`}
                   >
-                    {item.following
-                      ? <><Check size={13} /> Đang theo dõi</>
-                      : <><Plus size={13} /> Theo dõi</>
-                    }
+                    {item.following ? (
+                      <>
+                        <Check size={13} /> Đang theo dõi
+                      </>
+                    ) : (
+                      <>
+                        <Plus size={13} /> Theo dõi
+                      </>
+                    )}
                   </button>
                 </div>
               ))}
@@ -167,9 +195,12 @@ export default function NetworkTab() {
               Người bạn có thể biết
             </div>
             {mockConnections.slice(0, 3).map((p) => (
-              <div key={p.id} className="flex items-center gap-2.5 px-[18px] py-2.5 border-t border-gray-100">
+              <div
+                key={p.id}
+                className="flex items-center gap-2.5 px-[18px] py-2.5 border-t border-gray-100"
+              >
                 <div
-                  className="w-9.5 h-9.5 rounded-full shrink-0 flex items-center justify-center text-[13px] font-bold text-white"
+                  className="w-[38px] h-[38px] rounded-full shrink-0 flex items-center justify-center text-[13px] font-bold text-white"
                   style={{ background: p.color }}
                 >
                   {p.avatar}
@@ -182,20 +213,24 @@ export default function NetworkTab() {
                   >
                     {p.name}
                   </Link>
-                  <div className="text-[11.5px] text-gray-400 truncate">{p.role}</div>
+                  <div className="text-[11.5px] text-gray-400 truncate">
+                    {p.role}
+                  </div>
                 </div>
                 <button
                   onClick={() => toggleConnect(p.id)}
                   className={`flex items-center justify-center w-8 h-8 rounded-full border-[1.5px] cursor-pointer transition-all shrink-0
-                              ${connected.includes(p.id)
-                                ? "bg-gray-100 border-gray-300 text-gray-500"
-                                : "border-violet-600 text-violet-600 bg-transparent hover:bg-violet-600 hover:text-white"
+                              ${
+                                connected.includes(p.id)
+                                  ? "bg-gray-100 border-gray-300 text-gray-500"
+                                  : "border-violet-600 text-violet-600 bg-transparent hover:bg-violet-600 hover:text-white"
                               }`}
                 >
-                  {connected.includes(p.id)
-                    ? <UserCheck size={14} />
-                    : <UserPlus size={14} />
-                  }
+                  {connected.includes(p.id) ? (
+                    <UserCheck size={14} />
+                  ) : (
+                    <UserPlus size={14} />
+                  )}
                 </button>
               </div>
             ))}
@@ -208,7 +243,6 @@ export default function NetworkTab() {
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

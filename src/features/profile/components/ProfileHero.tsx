@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { MapPin, Pencil, UserPlus, UserCheck, MessageCircle, ChevronRight } from "lucide-react";
+import {
+  MapPin,
+  Pencil,
+  UserPlus,
+  UserCheck,
+  MessageCircle,
+  ChevronRight,
+} from "lucide-react";
 import { mockProfileUser } from "../data/profileMockData";
 import { Tab, initials } from "../types";
 
@@ -20,7 +27,8 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
       <div
         className="h-40"
         style={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
+          background:
+            "linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)",
         }}
       />
 
@@ -51,7 +59,10 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
             <div className="flex items-center gap-2">
               <h1
                 className="text-2xl text-gray-900 tracking-tight"
-                style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400 }}
+                style={{
+                  fontFamily: "'DM Serif Display', serif",
+                  fontWeight: 400,
+                }}
               >
                 {u.fullName}
               </h1>
@@ -76,13 +87,19 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
                 className="flex gap-1 items-baseline bg-transparent border-none cursor-pointer p-0"
                 onClick={() => onTabChange("network")}
               >
-                <span className="text-[14px] font-bold text-violet-600">{u.connections}</span>
+                <span className="text-[14px] font-bold text-violet-600">
+                  {u.connections}
+                </span>
                 <span className="text-[12px] text-gray-500">kết nối</span>
               </button>
               <span className="text-gray-300 text-sm">·</span>
               <button className="flex gap-1 items-baseline bg-transparent border-none cursor-pointer p-0">
-                <span className="text-[14px] font-bold text-violet-600">{u.followers}</span>
-                <span className="text-[12px] text-gray-500">người theo dõi</span>
+                <span className="text-[14px] font-bold text-violet-600">
+                  {u.followers}
+                </span>
+                <span className="text-[12px] text-gray-500">
+                  người theo dõi
+                </span>
               </button>
             </div>
           </div>
@@ -103,7 +120,7 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
                 Chỉnh sửa hồ sơ
               </Link>
               <button
-                className="flex items-center gap-1.5 px-4.5 py-1.75 rounded-full border-[1.5px] border-violet-600 text-violet-600
+                className="flex items-center gap-1.5 px-[18px] py-[7px] rounded-full border-[1.5px] border-violet-600 text-violet-600
                            text-[13.5px] font-semibold hover:bg-violet-600 hover:text-white
                            transition-all duration-150 whitespace-nowrap bg-transparent cursor-pointer"
               >
@@ -121,7 +138,7 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
               </button>
               <button
                 onClick={() => setFollowed(!followed)}
-                className={`flex items-center gap-1.5 px-4.5 py-1.75 rounded-full border-[1.5px] text-[13.5px] font-semibold
+                className={`flex items-center gap-1.5 px-[18px] py-[7px] rounded-full border-[1.5px] text-[13.5px] font-semibold
                             transition-all duration-150 whitespace-nowrap cursor-pointer
                             ${
                               followed
@@ -133,7 +150,7 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
                 {followed ? "Đang theo dõi" : "Theo dõi"}
               </button>
               <button
-                className="flex items-center gap-1.5 px-4 py-1.75 rounded-full border-[1.5px] border-gray-300 text-gray-500
+                className="flex items-center gap-1.5 px-4 py-[7px] rounded-full border-[1.5px] border-gray-300 text-gray-500
                            text-[13.5px] font-medium hover:border-gray-400 hover:text-gray-800
                            transition-all duration-150 whitespace-nowrap bg-transparent cursor-pointer"
               >
@@ -152,11 +169,13 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
                       flex items-center gap-2.5 text-[13px]"
         >
           <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
-          <strong className="text-gray-800">Đang tìm kiếm cơ hội việc làm</strong>
-          <span className="text-gray-500 ml-1">Thực tập Frontend · TP.HCM + Remote</span>
-          <button
-            className="ml-auto flex items-center gap-1 text-green-700 font-semibold bg-transparent border-none cursor-pointer text-[13px]"
-          >
+          <strong className="text-gray-800">
+            Đang tìm kiếm cơ hội việc làm
+          </strong>
+          <span className="text-gray-500 ml-1">
+            Thực tập Frontend · TP.HCM + Remote
+          </span>
+          <button className="ml-auto flex items-center gap-1 text-green-700 font-semibold bg-transparent border-none cursor-pointer text-[13px]">
             Xem chi tiết
             <ChevronRight size={14} />
           </button>

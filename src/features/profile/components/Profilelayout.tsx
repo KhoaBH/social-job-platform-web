@@ -25,14 +25,16 @@ export default function ProfileLayout() {
       `}</style> */}
 
       <div className="min-h-screen bg-[#F0F2F5]">
-        <div className="max-w-270 mx-auto px-4 py-5 flex flex-col gap-1">
+        <div className="max-w-[1080px] mx-auto px-4 py-5 flex flex-col gap-1">
           <ProfileHero onTabChange={setActiveTab} />
           <ProfileTabBar active={activeTab} onChange={setActiveTab} />
 
-          {activeTab === "overview"  && <OverviewTab onTabChange={setActiveTab} />}
-          {activeTab === "profile"   && <ProfileSkillsTab />}
-          {activeTab === "activity"  && <ActivityTab />}
-          {activeTab === "network"   && <NetworkTab />}
+          {activeTab === "overview" && (
+            <OverviewTab onTabChange={setActiveTab} />
+          )}
+          {activeTab === "profile" && <ProfileSkillsTab />}
+          {activeTab === "activity" && <ActivityTab />}
+          {activeTab === "network" && <NetworkTab />}
         </div>
       </div>
     </>

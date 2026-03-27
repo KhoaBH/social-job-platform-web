@@ -15,9 +15,21 @@ import { mockProfileUser, mockPosts } from "../../data/profileMockData";
 import { initials } from "../../types";
 
 const recentActivities = [
-  { icon: <Heart size={16} className="text-rose-500" />,    text: "Jane Đặng đã thích bài viết của bạn",      time: "2 giờ trước"  },
-  { icon: <MessageCircle size={16} className="text-blue-500" />, text: "Minh Tuấn đã bình luận bài viết của bạn", time: "5 giờ trước"  },
-  { icon: <Users size={16} className="text-violet-500" />,  text: "Lan Anh đã kết nối với bạn",                time: "1 ngày trước" },
+  {
+    icon: <Heart size={16} className="text-rose-500" />,
+    text: "Jane Đặng đã thích bài viết của bạn",
+    time: "2 giờ trước",
+  },
+  {
+    icon: <MessageCircle size={16} className="text-blue-500" />,
+    text: "Minh Tuấn đã bình luận bài viết của bạn",
+    time: "5 giờ trước",
+  },
+  {
+    icon: <Users size={16} className="text-violet-500" />,
+    text: "Lan Anh đã kết nối với bạn",
+    time: "1 ngày trước",
+  },
 ];
 
 export default function ActivityTab() {
@@ -28,16 +40,19 @@ export default function ActivityTab() {
     setPosts((prev) =>
       prev.map((p) =>
         p.id === id
-          ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 }
-          : p
-      )
+          ? {
+              ...p,
+              liked: !p.liked,
+              likes: p.liked ? p.likes - 1 : p.likes + 1,
+            }
+          : p,
+      ),
     );
   };
 
   return (
     <div className="animate-[fadeIn_0.2s_ease]">
       <div className="grid grid-cols-[1fr_300px] gap-4 max-[900px]:grid-cols-1">
-
         {/* ── Main column ── */}
         <div className="flex flex-col gap-3">
           <section className="bg-white rounded-2xl p-5 shadow-sm">
@@ -46,7 +61,10 @@ export default function ActivityTab() {
             <div className="flex items-center justify-between mb-4">
               <h2
                 className="text-lg text-gray-900"
-                style={{ fontFamily: "'DM Serif Display', serif", fontWeight: 400 }}
+                style={{
+                  fontFamily: "'DM Serif Display', serif",
+                  fontWeight: 400,
+                }}
               >
                 Bài đăng của tôi
               </h2>
@@ -75,7 +93,9 @@ export default function ActivityTab() {
                     {initials(u.fullName)}
                   </div>
                   <div className="flex-1">
-                    <div className="text-[13.5px] font-semibold text-gray-900">{u.fullName}</div>
+                    <div className="text-[13.5px] font-semibold text-gray-900">
+                      {u.fullName}
+                    </div>
                     <div className="text-[12px] text-gray-400">{post.time}</div>
                   </div>
                   {u.isOwner && (
@@ -99,7 +119,9 @@ export default function ActivityTab() {
                     <ThumbsUp size={11} />
                     {post.likes} lượt thích
                   </span>
-                  <span>{post.comments} bình luận · {post.shares} chia sẻ</span>
+                  <span>
+                    {post.comments} bình luận · {post.shares} chia sẻ
+                  </span>
                 </div>
 
                 {/* Actions */}
@@ -129,9 +151,10 @@ export default function ActivityTab() {
                       onClick={action}
                       className={`flex-1 py-2.5 text-[13px] font-semibold flex items-center justify-center gap-1.5
                                   bg-transparent border-none cursor-pointer transition-all
-                                  ${liked
-                                    ? "text-violet-600"
-                                    : "text-gray-500 hover:bg-gray-100 hover:text-violet-600"
+                                  ${
+                                    liked
+                                      ? "text-violet-600"
+                                      : "text-gray-500 hover:bg-gray-100 hover:text-violet-600"
                                   }`}
                     >
                       {icon}
@@ -147,15 +170,22 @@ export default function ActivityTab() {
         {/* ── Side column ── */}
         <div className="flex flex-col gap-3 max-[900px]:hidden">
           <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-            <div className="px-4.5 pt-4 pb-3 text-[14px] font-semibold text-gray-900">
+            <div className="px-[18px] pt-4 pb-3 text-[14px] font-semibold text-gray-900">
               Hoạt động gần đây
             </div>
             {recentActivities.map((a, i) => (
-              <div key={i} className="px-4.5 py-2.5 border-t border-gray-100 flex items-start gap-2.5">
+              <div
+                key={i}
+                className="px-[18px] py-2.5 border-t border-gray-100 flex items-start gap-2.5"
+              >
                 <span className="shrink-0 mt-0.5">{a.icon}</span>
                 <div>
-                  <div className="text-[13px] text-gray-700 leading-relaxed">{a.text}</div>
-                  <div className="text-[11.5px] text-gray-400 mt-0.5">{a.time}</div>
+                  <div className="text-[13px] text-gray-700 leading-relaxed">
+                    {a.text}
+                  </div>
+                  <div className="text-[11.5px] text-gray-400 mt-0.5">
+                    {a.time}
+                  </div>
                 </div>
               </div>
             ))}
@@ -168,7 +198,6 @@ export default function ActivityTab() {
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );
