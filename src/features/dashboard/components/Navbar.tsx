@@ -40,7 +40,12 @@ export default function Navbar({ activeNav, setActiveNav, initials }: NavbarProp
               <span>{nl.label}</span>
             </button>
           ))}
-          <div className="nav-avatar">{initials(user?.fullName || "U")}</div>
+          <div 
+            className="nav-avatar"
+            onClick={() => router.push(`/profile/${user?.id}`)}
+          >
+            {initials(user?.fullName || "U")}
+          </div>
           <button className="nav-logout" onClick={handleLogout}>
             Đăng xuất
           </button>
