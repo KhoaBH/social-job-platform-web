@@ -1,5 +1,4 @@
 "use client";
-// src/app/(main)/dashboard/page.tsx
  
 import dynamic from "next/dynamic";
  

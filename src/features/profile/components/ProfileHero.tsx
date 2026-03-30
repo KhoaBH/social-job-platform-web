@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { mockProfileUser } from "../data/profileMockData";
 import { Tab, initials } from "../types";
+import { ROUTES } from "@/constants/routes";
 
 interface ProfileHeroProps {
   onTabChange: (t: Tab) => void;
@@ -111,7 +112,7 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
             <>
               {/* Edit profile → internal page */}
               <Link
-                href="/profile/edit"
+                href={ROUTES.PROTECTED.PROFILE.EDIT}
                 className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-violet-600 text-white text-[13.5px] font-semibold
                            hover:bg-violet-700 hover:-translate-y-px hover:shadow-lg hover:shadow-violet-200
                            transition-all duration-150 whitespace-nowrap no-underline"

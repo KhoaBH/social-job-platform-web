@@ -1,4 +1,3 @@
-// src/features/profile/constants/profileMockData.ts
 
 export const mockProfileUser = {
   fullName: "Lâm Anh Khoa",

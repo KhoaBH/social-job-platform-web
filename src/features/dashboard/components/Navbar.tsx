@@ -4,6 +4,8 @@ import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { navLinks } from "../data/mockData";
+import { ROUTES } from "@/constants/routes";
+import Link from "next/link";
 
 interface NavbarProps {
   activeNav: number;
@@ -18,7 +20,7 @@ export default function Navbar({ activeNav, setActiveNav, initials }: NavbarProp
 
   const handleLogout = () => {
     dispatch(logout());
-    router.push("/login");
+    router.push(ROUTES.PUBLIC.LOGIN);
   };
 
   return (
@@ -40,12 +42,12 @@ export default function Navbar({ activeNav, setActiveNav, initials }: NavbarProp
               <span>{nl.label}</span>
             </button>
           ))}
-          <div 
+          <Link
+            href={user?.id ? ROUTES.PROTECTED.PROFILE.VIEW(user.id) : "#"}
             className="nav-avatar"
-            onClick={() => router.push(`/profile/${user?.id}`)}
           >
             {initials(user?.fullName || "U")}
-          </div>
+          </Link>
           <button className="nav-logout" onClick={handleLogout}>
             Đăng xuất
           </button>
