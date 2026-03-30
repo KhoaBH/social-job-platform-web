@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
-import { navLinks } from "../data/mockData";
+import { navLinks } from "../../data/mockData";
 import { ROUTES } from "@/constants/routes";
 import { Search } from "lucide-react";
 
