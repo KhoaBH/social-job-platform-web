@@ -1,67 +1,118 @@
 "use client";
+
 import { useState } from "react";
-import { jobSuggestions, suggestedConnections, trendingTopics } from "../data/mockData";
+import { ArrowRight, UserPlus, Check, } from "lucide-react";
+import { jobSuggestions, suggestedConnections, trendingTopics, } from "../data/mockData";
 
 export default function RightSidebar() {
   const [connected, setConnected] = useState<number[]>([]);
 
   return (
-    <div className="right-col">
+    <div className="flex flex-col gap-2.5">
+
       {/* Jobs */}
-      <div className="widget-card">
-        <div className="widget-title">Việc làm gợi ý</div>
+      <div className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden">
+        <div className="text-[15px] font-bold px-4 pt-3.5 pb-2.5">Việc làm gợi ý</div>
         {jobSuggestions.map((job, i) => (
-          <div className="job-item" key={i}>
-            <div className="job-logo" style={{ background: job.color }}>{job.logo}</div>
-            <div className="job-info">
-              <div className="job-title">{job.title}</div>
-              <div className="job-company">{job.company}</div>
-              <div className="job-salary">{job.salary}/tháng</div>
+          <div
+            key={i}
+            className="flex items-center gap-3 px-4 py-2.5 border-t border-[#E4E4E7]
+                       cursor-pointer transition-[background] duration-100 hover:bg-[#F8F8FC]"
+          >
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center
+                         text-base font-extrabold text-white shrink-0"
+              style={{ background: job.color }}
+            >
+              {job.logo}
             </div>
-            <button className="apply-btn">Nộp CV</button>
+            <div className="flex-1">
+              <div className="text-[13.5px] font-semibold">{job.title}</div>
+              <div className="text-[12px] text-[#666]">{job.company}</div>
+              <div className="text-[11.5px] text-[#0A66C2] font-semibold mt-0.5">
+                {job.salary}/tháng
+              </div>
+            </div>
+            <button className="text-[12.5px] font-bold px-3.5 py-1.25 rounded-2xl
+                               border-[1.5px] border-[#0A66C2] text-[#0A66C2] bg-transparent
+                               cursor-pointer font-[inherit] shrink-0
+                               transition-all duration-150 hover:bg-[#0A66C2] hover:text-white">
+              Nộp CV
+            </button>
           </div>
         ))}
-        <div className="widget-footer">Xem thêm →</div>
+        <div className="flex items-center justify-center gap-1 px-2.5 py-2.5 border-t border-[#E4E4E7]
+                        text-[13px] font-semibold text-[#0A66C2] cursor-pointer hover:bg-[#F2F2F7]">
+          Xem thêm <ArrowRight size={14} />
+        </div>
       </div>
 
       {/* People */}
-      <div className="widget-card">
-        <div className="widget-title">Người bạn có thể biết</div>
+      <div className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden">
+        <div className="text-[15px] font-bold px-4 pt-3.5 pb-2.5">Người bạn có thể biết</div>
         {suggestedConnections.map((person, i) => (
-          <div className="person-item" key={i}>
-            <div className="person-ava" style={{ background: person.color }}>{person.avatar}</div>
-            <div className="person-info">
-              <div className="person-name">{person.name}</div>
-              <div className="person-role">{person.role}</div>
-              <div className="person-mutual">{person.mutual} kết nối chung</div>
+          <div key={i} className="flex items-center gap-2.5 px-4 py-2.5 border-t border-[#E4E4E7]">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center
+                         text-[15px] font-bold text-white shrink-0"
+              style={{ background: person.color }}
+            >
+              {person.avatar}
+            </div>
+            <div className="flex-1">
+              <div className="text-[13.5px] font-semibold">{person.name}</div>
+              <div className="text-[12px] text-[#666]">{person.role}</div>
+              <div className="text-[11.5px] text-[#999]">{person.mutual} kết nối chung</div>
             </div>
             <button
-              className={`connect-btn${connected.includes(i) ? " done" : ""}`}
               onClick={() =>
                 setConnected((prev) =>
                   prev.includes(i) ? prev.filter((x) => x !== i) : [...prev, i]
                 )
               }
+              className={`flex items-center gap-1 text-[12.5px] font-bold px-3.5 py-1.25 rounded-2xl border-[1.5px]
+                          cursor-pointer font-[inherit] shrink-0 transition-all duration-150
+                          ${
+                            connected.includes(i)
+                              ? "border-[#C9CDD2] text-[#666] bg-[#F2F2F7]"
+                              : "border-[#0A66C2] text-[#0A66C2] bg-transparent hover:bg-[#0A66C2] hover:text-white"
+                          }`}
             >
-              {connected.includes(i) ? "✓ Đã kết nối" : "+ Kết nối"}
+              {connected.includes(i) ? (
+                <>
+                  <Check size={14} /> Đã kết nối
+                </>
+              ) : (
+                <>
+                  <UserPlus size={14} /> Kết nối
+                </>
+              )}
             </button>
           </div>
         ))}
-        <div className="widget-footer">Xem tất cả →</div>
+        <div className="flex items-center justify-center gap-1 px-2.5 py-2.5 border-t border-[#E4E4E7]
+                        text-[13px] font-semibold text-[#0A66C2] cursor-pointer hover:bg-[#F2F2F7]">
+          Xem tất cả <ArrowRight size={14} />
+        </div>
       </div>
 
       {/* Trending */}
-      <div className="widget-card">
-        <div className="widget-title">Xu hướng hôm nay</div>
+      <div className="bg-white border border-[#E4E4E7] rounded-[10px] overflow-hidden">
+        <div className="text-[15px] font-bold px-4 pt-3.5 pb-2.5">Xu hướng hôm nay</div>
         {trendingTopics.map((t, i) => (
-          <div className="trend-item" key={i}>
-            <div className="trend-tag">{t.tag}</div>
-            <div className="trend-count">{t.count}</div>
+          <div
+            key={i}
+            className="px-4 py-2 border-t border-[#E4E4E7] cursor-pointer
+                       transition-[background] duration-100 hover:bg-[#F8F8FC]"
+          >
+            <div className="text-[13.5px] font-semibold text-[#0A66C2]">{t.tag}</div>
+            <div className="text-[11.5px] text-[#999] mt-px">{t.count}</div>
           </div>
         ))}
       </div>
 
-      <div className="footer-links">
+      {/* Footer */}
+      <div className="text-[11px] text-[#999] leading-[1.9] py-1">
         Giới thiệu · Điều khoản · Chính sách · Cookie
         <br />© 2026 Jub Vietnam
       </div>

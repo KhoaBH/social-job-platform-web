@@ -1,11 +1,13 @@
 "use client";
+
+import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { navLinks } from "../data/mockData";
 import { ROUTES } from "@/constants/routes";
-import Link from "next/link";
+import { Search } from "lucide-react";
 
 interface NavbarProps {
   activeNav: number;
@@ -24,31 +26,59 @@ export default function Navbar({ activeNav, setActiveNav, initials }: NavbarProp
   };
 
   return (
-    <nav className="jub-nav">
-      <div className="nav-inner">
-        <span className="nav-logo">jub.</span>
-        <div className="nav-search">
-          <span>🔍</span>
-          <input placeholder="Tìm kiếm..." />
+    <nav className="bg-white border-b border-[#E4E4E7] sticky top-0 z-100 h-14 flex items-center px-4">
+      <div className="max-w-282 w-full mx-auto flex items-center gap-0">
+        {/* Logo */}
+        <span className="text-[22px] font-bold text-[#0A66C2] tracking-[-0.5px] mr-3">
+          jub.
+        </span>
+
+        {/* Search */}
+        <div className="flex items-center gap-2 bg-[#EEF3F8] rounded-md px-3 h-8.5 w-55 shrink-0">
+           <Search size={16} />
+          <input
+            className="bg-transparent border-none outline-none font-[inherit] text-[13.5px]
+                       text-[#1A1A1A] w-full placeholder:text-[#888]"
+            placeholder="Tìm kiếm..."
+          />
         </div>
-        <div className="nav-links">
+
+        {/* Nav links */}
+        <div className="flex items-center ml-auto gap-1">
           {navLinks.map((nl, i) => (
             <button
               key={i}
-              className={`nav-link${activeNav === i ? " active" : ""}`}
               onClick={() => setActiveNav(i)}
+              className={`flex flex-col items-center gap-0.5 px-4 h-14 justify-center
+                          text-[11.5px] cursor-pointer border-none border-b-2 bg-transparent
+                          font-[inherit] transition-all duration-150
+                          ${activeNav === i
+                            ? "text-[#1A1A1A] border-[#1A1A1A]"
+                            : "text-[#666] border-transparent hover:text-[#1A1A1A]"
+                          }`}
             >
-              <span className="nl-icon">{nl.icon}</span>
+              <span className="text-xl leading-none">{nl.icon}</span>
               <span>{nl.label}</span>
             </button>
           ))}
+
+          {/* Avatar → profile link */}
           <Link
             href={user?.id ? ROUTES.PROTECTED.PROFILE.VIEW(user.id) : "#"}
-            className="nav-avatar"
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white bg-[#0A66C2]
+                       cursor-pointer shrink-0 ml-2 no-underline"
           >
             {initials(user?.fullName || "U")}
           </Link>
-          <button className="nav-logout" onClick={handleLogout}>
+
+          {/* Logout */}
+          <button
+            onClick={handleLogout}
+            className="ml-2 px-3.5 py-1.5 text-[12.5px] font-semibold text-[#666]
+                       border-[1.5px] border-[#C9CDD2] rounded-2xl bg-transparent
+                       cursor-pointer font-[inherit] transition-all duration-150
+                       hover:border-[#1A1A1A] hover:text-[#1A1A1A]"
+          >
             Đăng xuất
           </button>
         </div>
