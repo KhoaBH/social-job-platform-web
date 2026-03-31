@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Pencil, ThumbsUp, Check, Globe, Link2 } from "lucide-react";
+import { Pencil, ThumbsUp, Check, Globe, Link2 } from "lucide-react";
 import {
   mockProfileUser,
   mockExperiences,
@@ -11,6 +11,7 @@ import {
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
+import AddExperienceModal from "../models/AddExperienceModal/index";
 
 const SKILL_CATS = ["Tất cả", "Kỹ thuật", "Thiết kế", "Kỹ năng mềm"];
 
@@ -18,6 +19,7 @@ export default function ProfileSkillsTab() {
   const u = mockProfileUser;
   const [skills, setSkills] = useState(mockSkills);
   const [activeSkillCat, setActiveSkillCat] = useState("Tất cả");
+  const [addExpOpen, setAddExpOpen] = useState(false);
 
   const filtered =
     activeSkillCat === "Tất cả"
@@ -50,21 +52,12 @@ export default function ProfileSkillsTab() {
             <SectionHead
               title="Kinh nghiệm"
               showAdd={u.isOwner}
+              onAdd={() => setAddExpOpen(true)}
               showEdit={u.isOwner}
             />
             {mockExperiences.map((exp) => (
               <ExperienceItem key={exp.id} exp={exp} compact={false} />
             ))}
-            {u.isOwner && (
-              <button
-                className="mt-3 w-full py-2.5 border-[1.5px] border-dashed border-violet-300 rounded-xl
-                                 text-violet-600 text-[13.5px] font-semibold bg-gray-50 cursor-pointer
-                                 hover:bg-violet-50 transition-all flex items-center justify-center gap-1.5"
-              >
-                <Plus size={15} />
-                Thêm kinh nghiệm
-              </button>
-            )}
           </section>
 
           {/* Education */}
@@ -191,6 +184,15 @@ export default function ProfileSkillsTab() {
           )}
         </div>
       </div>
+
+      {/* Add Experience Modal */}
+      <AddExperienceModal
+        open={addExpOpen}
+        onClose={() => setAddExpOpen(false)}
+        onSave={(data) => {
+          console.log("New experience:", data);
+        }}
+      />
     </div>
   );
 }

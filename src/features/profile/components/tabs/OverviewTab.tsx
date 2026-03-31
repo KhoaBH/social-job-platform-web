@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import {
   Link2,
   Users,
@@ -21,6 +22,8 @@ import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
 import { Tab } from "../../types";
+// import AddExperienceModal from "../models/Addexperiencemodal";
+import AddExperienceModal from "../models/AddExperienceModal/index";
 
 interface OverviewTabProps {
   onTabChange: (t: Tab) => void;
@@ -28,6 +31,7 @@ interface OverviewTabProps {
 
 export default function OverviewTab({ onTabChange }: OverviewTabProps) {
   const u = mockProfileUser;
+  const [addExpOpen, setAddExpOpen] = useState(false);
 
   const analyticsItems = [
     { icon: <Users size={20} />, num: u.profileViews, label: "Lượt xem hồ sơ" },
@@ -72,6 +76,7 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
             <SectionHead
               title="Kinh nghiệm"
               showAdd={u.isOwner}
+              onAdd={() => setAddExpOpen(true)}
               onSeeAll={() => onTabChange("profile")}
             />
             {mockExperiences.slice(0, 2).map((exp) => (
@@ -119,13 +124,13 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
           {/* Analytics */}
           {u.isOwner && (
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-              <div className="px-[18px] pt-4 pb-3 text-[14px] font-semibold text-gray-900 flex items-center justify-between">
+              <div className="px-4.5 pt-4 pb-3 text-[14px] font-semibold text-gray-900 flex items-center justify-between">
                 <span>Phân tích</span>
                 <span className="flex items-center gap-1 text-[11.5px] text-gray-400 font-normal">
                   <Eye size={12} /> Riêng tư
                 </span>
               </div>
-              <div className="px-[18px] pb-3.5 flex flex-col gap-3">
+              <div className="px-4.5 pb-3.5 flex flex-col gap-3">
                 {analyticsItems.map((item) => (
                   <div key={item.label} className="flex items-center gap-3">
                     <span className="text-gray-400">{item.icon}</span>
@@ -153,13 +158,13 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
           {/* Suggestions */}
           {u.isOwner && (
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-              <div className="px-[18px] pt-4 pb-3 text-[14px] font-semibold text-gray-900 flex items-center justify-between">
+              <div className="px-4.5 pt-4 pb-3 text-[14px] font-semibold text-gray-900 flex items-center justify-between">
                 <span>Đề xuất cho bạn</span>
                 <span className="flex items-center gap-1 text-[11.5px] text-gray-400 font-normal">
                   <Eye size={12} /> Riêng tư
                 </span>
               </div>
-              <div className="px-[18px] pb-4 flex gap-3 items-start">
+              <div className="px-4.5 pb-4 flex gap-3 items-start">
                 <FileText size={28} className="text-gray-400 shrink-0 mt-0.5" />
                 <div>
                   <div className="text-[13.5px] font-semibold text-gray-900">
@@ -181,11 +186,11 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
 
           {/* School */}
           <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-            <div className="px-[18px] pt-4 pb-3 text-[14px] font-semibold text-gray-900 flex items-center gap-2">
+            <div className="px-4.5 pt-4 pb-3 text-[14px] font-semibold text-gray-900 flex items-center gap-2">
               <GraduationCap size={16} className="text-gray-400" />
               Trường học
             </div>
-            <div className="px-[18px] pb-4 flex items-center gap-3">
+            <div className="px-4.5 pb-4 flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-blue-700 flex items-center justify-center text-[10px] font-extrabold text-white shrink-0">
                 UIT
               </div>
@@ -204,6 +209,15 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
           </div>
         </div>
       </div>
+
+      {/*  Add Experience Modal  */}
+      <AddExperienceModal
+        open={addExpOpen}
+        onClose={() => setAddExpOpen(false)}
+        onSave={(data) => {
+          console.log("New experience:", data);
+        }}
+      />
     </div>
   );
 }

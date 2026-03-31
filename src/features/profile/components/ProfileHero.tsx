@@ -10,17 +10,32 @@ import {
   MessageCircle,
   ChevronRight,
 } from "lucide-react";
-import { mockProfileUser } from "../data/profileMockData";
+// import { mockProfileUser } from "../data/profileMockData";
 import { Tab, initials } from "../types";
 import { ROUTES } from "@/constants/routes";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
 
 interface ProfileHeroProps {
   onTabChange: (t: Tab) => void;
 }
 
+
 export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
-  const u = mockProfileUser;
+  const user = useSelector((state: RootState) => state.auth.user);
+  // const u = mockProfileUser;
   const [followed, setFollowed] = useState(false);
+
+  const u = {
+  fullName: user?.fullName || "Người dùng",
+  avatar: user?.avatarUrl || "",
+  isOwner: true, 
+  headline: "Sinh viên tại University of Information Technology – VNU-HCM",
+  location: "TP.HCM", 
+  connections: 0,
+  followers: 0,
+  openToWork: true,
+};
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden mb-1 shadow-sm">

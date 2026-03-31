@@ -5,6 +5,7 @@ import { Pencil, Plus, ArrowRight } from "lucide-react";
 interface SectionHeadProps {
   title: string;
   onSeeAll?: () => void;
+  onAdd?: () => void;
   showAdd?: boolean;
   showEdit?: boolean;
 }
@@ -12,6 +13,7 @@ interface SectionHeadProps {
 export default function SectionHead({
   title,
   onSeeAll,
+  onAdd,
   showAdd,
   showEdit,
 }: SectionHeadProps) {
@@ -25,8 +27,11 @@ export default function SectionHead({
       </h2>
       <div className="flex items-center gap-1.5">
         {showAdd && (
-          <button className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400
-                             hover:bg-gray-100 transition-colors bg-transparent border-none cursor-pointer">
+          <button
+            onClick={onAdd}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400
+                       hover:bg-gray-100 transition-colors bg-transparent border-none cursor-pointer"
+          >
             <Plus size={16} />
           </button>
         )}
