@@ -7,6 +7,7 @@ import { useLoginWithFirebaseMutation } from "@/features/auth/authApi";
 import { useRouter } from "next/navigation";
 import { setCredentials } from "@/store/slices/authSlice";
 import { useDispatch } from "react-redux";
+import { ROUTES } from "@/constants/routes";
 
 export default function LoginForm() {
   const [loginWithFirebase, { isLoading }] = useLoginWithFirebaseMutation();
@@ -24,7 +25,7 @@ export default function LoginForm() {
         idToken,
       }).unwrap();
       dispatch(setCredentials(response));
-      router.push("/dashboard");
+      router.push(ROUTES.PROTECTED.DASHBOARD);
       console.log("Login successful:", response);
     } catch (error) {
       console.error("Google login failed:", error);

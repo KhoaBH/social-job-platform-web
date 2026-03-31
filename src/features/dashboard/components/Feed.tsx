@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { mockPosts } from "../data/mockData";
 import Composer from "./Composer";
@@ -23,7 +24,7 @@ export default function Feed({ initials, userFullName }: FeedProps) {
   };
 
   return (
-    <div className="feed">
+    <div className="flex flex-col gap-2.5">
       <Composer initials={initials} userFullName={userFullName} />
       {posts.map((post) => (
         <PostCard key={post.id} post={post} onToggleLike={toggleLike} />
