@@ -1,11 +1,9 @@
 "use client";
 
-import { mockExperiences } from "../../data/profileMockData";
-
-type Experience = (typeof mockExperiences)[0];
+import { ProfileExperienceView } from "../../types";
 
 interface ExperienceItemProps {
-  exp: Experience;
+  exp: ProfileExperienceView;
   compact: boolean;
 }
 
@@ -22,7 +20,9 @@ export default function ExperienceItem({ exp, compact }: ExperienceItemProps) {
 
       {/* Body */}
       <div className="flex-1 min-w-0">
-        <div className="text-[14.5px] font-semibold text-gray-900">{exp.title}</div>
+        <div className="text-[14.5px] font-semibold text-gray-900">
+          {exp.title}
+        </div>
         <div className="text-[13px] text-gray-500 mt-0.5">
           {exp.company} · {exp.type}
         </div>

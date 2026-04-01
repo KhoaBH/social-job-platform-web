@@ -11,31 +11,23 @@ import {
   ChevronRight,
 } from "lucide-react";
 // import { mockProfileUser } from "../data/profileMockData";
-import { Tab, initials } from "../types";
+import { ProfileUserView, Tab, initials } from "../types";
 import { ROUTES } from "@/constants/routes";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
 
 interface ProfileHeroProps {
   onTabChange: (t: Tab) => void;
+  user: ProfileUserView;
+  isLoading?: boolean;
 }
 
-
-export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
-  const user = useSelector((state: RootState) => state.auth.user);
-  // const u = mockProfileUser;
+export default function ProfileHero({
+  onTabChange,
+  user,
+  isLoading,
+}: ProfileHeroProps) {
   const [followed, setFollowed] = useState(false);
 
-  const u = {
-  fullName: user?.fullName || "Người dùng",
-  avatar: user?.avatarUrl || "",
-  isOwner: true, 
-  headline: "Sinh viên tại University of Information Technology – VNU-HCM",
-  location: "TP.HCM", 
-  connections: 0,
-  followers: 0,
-  openToWork: true,
-};
+  const u = user;
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden mb-1 shadow-sm">
@@ -63,7 +55,7 @@ export default function ProfileHero({ onTabChange }: ProfileHeroProps) {
                 boxShadow: "0 4px 16px rgba(91,79,207,0.25)",
               }}
             >
-              {initials(u.fullName)}
+              {isLoading ? "..." : initials(u.fullName)}
             </div>
             {/* {u.openToWork && (
               <div className="absolute -inset-1.5 rounded-full border-[3px] border-green-500 pointer-events-none" />

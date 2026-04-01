@@ -2,24 +2,52 @@
 
 import { useState } from "react";
 import { Pencil, ThumbsUp, Check, Globe, Link2 } from "lucide-react";
-import {
-  mockProfileUser,
-  mockExperiences,
-  mockEducation,
-  mockSkills,
-} from "../../data/profileMockData";
+import { mockSkills } from "../../data/profileMockData";
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
 import AddExperienceModal from "../models/AddExperienceModal/index";
+import {
+  ProfileEducationView,
+  ProfileExperienceView,
+  ProfileUserView,
+} from "../../types";
+import { ExperienceFormData } from "../models/AddExperienceModal/types";
+import AddEducationModal from "../models/AddEducationModal/index";
+import { EducationFormData } from "../models/AddEducationModal/types";
 
 const SKILL_CATS = ["Tất cả", "Kỹ thuật", "Thiết kế", "Kỹ năng mềm"];
 
-export default function ProfileSkillsTab() {
-  const u = mockProfileUser;
+interface ProfileSkillsTabProps {
+  user: ProfileUserView;
+  experiences: ProfileExperienceView[];
+  educations: ProfileEducationView[];
+  companies: Array<{ id: string; name?: string | null }>;
+  schools: Array<{ id: string; name?: string | null }>;
+  fieldOfStudies: Array<{ id: string; name?: string | null }>;
+  onCreateExperience: (data: ExperienceFormData) => Promise<void>;
+  isCreatingExperience?: boolean;
+  onCreateEducation: (data: EducationFormData) => Promise<void>;
+  isCreatingEducation?: boolean;
+}
+
+export default function ProfileSkillsTab({
+  user,
+  experiences,
+  educations,
+  companies,
+  schools,
+  fieldOfStudies,
+  onCreateExperience,
+  isCreatingExperience,
+  onCreateEducation,
+  isCreatingEducation,
+}: ProfileSkillsTabProps) {
+  const u = user;
   const [skills, setSkills] = useState(mockSkills);
   const [activeSkillCat, setActiveSkillCat] = useState("Tất cả");
   const [addExpOpen, setAddExpOpen] = useState(false);
+  const [addEduOpen, setAddEduOpen] = useState(false);
 
   const filtered =
     activeSkillCat === "Tất cả"
@@ -55,9 +83,14 @@ export default function ProfileSkillsTab() {
               onAdd={() => setAddExpOpen(true)}
               showEdit={u.isOwner}
             />
-            {mockExperiences.map((exp) => (
+            {experiences.map((exp) => (
               <ExperienceItem key={exp.id} exp={exp} compact={false} />
             ))}
+            {!experiences.length && (
+              <p className="text-[13px] text-gray-400">
+                Chưa có kinh nghiệm làm việc.
+              </p>
+            )}
           </section>
 
           {/* Education */}
@@ -65,11 +98,17 @@ export default function ProfileSkillsTab() {
             <SectionHead
               title="Học vấn"
               showAdd={u.isOwner}
+              onAdd={() => setAddEduOpen(true)}
               showEdit={u.isOwner}
             />
-            {mockEducation.map((edu) => (
+            {educations.map((edu) => (
               <EducationItem key={edu.id} edu={edu} compact={false} />
             ))}
+            {!educations.length && (
+              <p className="text-[13px] text-gray-400">
+                Chưa có thông tin học vấn.
+              </p>
+            )}
           </section>
 
           {/* Skills */}
@@ -189,9 +228,18 @@ export default function ProfileSkillsTab() {
       <AddExperienceModal
         open={addExpOpen}
         onClose={() => setAddExpOpen(false)}
-        onSave={(data) => {
-          console.log("New experience:", data);
-        }}
+        companies={companies}
+        isSaving={isCreatingExperience}
+        onSave={onCreateExperience}
+      />
+
+      <AddEducationModal
+        open={addEduOpen}
+        onClose={() => setAddEduOpen(false)}
+        schools={schools}
+        fieldOfStudies={fieldOfStudies}
+        isSaving={isCreatingEducation}
+        onSave={onCreateEducation}
       />
     </div>
   );

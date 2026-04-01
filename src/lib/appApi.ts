@@ -5,12 +5,20 @@ export const appApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_URL,
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth.token;
+      const state = getState() as { auth?: { token?: string | null } };
+      const token = state.auth?.token;
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
       return headers;
     },
   }),
+  tagTypes: [
+    "ProfileUser",
+    "ProfileExperience",
+    "ProfileEducation",
+    "ProfileFollow",
+    "ProfileConnection",
+  ],
   endpoints: () => ({}),
 });
