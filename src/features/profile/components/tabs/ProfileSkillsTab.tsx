@@ -1,46 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, ThumbsUp, Check, Globe, Link2 } from "lucide-react";
-import {
-  mockProfileUser,
-  mockExperiences,
-  mockEducation,
-  mockSkills,
-} from "../../data/profileMockData";
+import { Pencil, Globe, Link2 } from "lucide-react";
+import { mockSkills } from "../../data/profileMockData";
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
 import AddExperienceModal from "../models/AddExperienceModal/index";
+import {
+  ProfileEducationView,
+  ProfileExperienceView,
+  ProfileUserView,
+} from "../../types";
+import { ExperienceFormData } from "../models/AddExperienceModal/types";
+import AddEducationModal from "../models/AddEducationModal/index";
+import { EducationFormData } from "../models/AddEducationModal/types";
 
 const SKILL_CATS = ["Tất cả", "Kỹ thuật", "Thiết kế", "Kỹ năng mềm"];
 
-export default function ProfileSkillsTab() {
-  const u = mockProfileUser;
-  const [skills, setSkills] = useState(mockSkills);
+interface ProfileSkillsTabProps {
+  user: ProfileUserView;
+  experiences: ProfileExperienceView[];
+  educations: ProfileEducationView[];
+  companies: Array<{ id: string; name?: string | null }>;
+  schools: Array<{ id: string; name?: string | null }>;
+  fieldOfStudies: Array<{ id: string; name?: string | null }>;
+  onCreateExperience: (data: ExperienceFormData) => Promise<void>;
+  isCreatingExperience?: boolean;
+  onCreateEducation: (data: EducationFormData) => Promise<void>;
+  isCreatingEducation?: boolean;
+}
+
+export default function ProfileSkillsTab({
+  user,
+  experiences,
+  educations,
+  companies,
+  schools,
+  fieldOfStudies,
+  onCreateExperience,
+  isCreatingExperience,
+  onCreateEducation,
+  isCreatingEducation,
+}: ProfileSkillsTabProps) {
+  const u = user;
+  const [skills] = useState(mockSkills);
   const [activeSkillCat, setActiveSkillCat] = useState("Tất cả");
   const [addExpOpen, setAddExpOpen] = useState(false);
+  const [addEduOpen, setAddEduOpen] = useState(false);
 
   const filtered =
     activeSkillCat === "Tất cả"
       ? skills
       : skills.filter((s) => s.category === activeSkillCat);
-
-  const toggleEndorse = (id: number) => {
-    setSkills((prev) =>
-      prev.map((s) =>
-        s.id === id
-          ? {
-              ...s,
-              endorsed: !s.endorsed,
-              endorsements: s.endorsed
-                ? s.endorsements - 1
-                : s.endorsements + 1,
-            }
-          : s,
-      ),
-    );
-  };
 
   return (
     <div className="animate-[fadeIn_0.2s_ease]">
@@ -55,9 +67,14 @@ export default function ProfileSkillsTab() {
               onAdd={() => setAddExpOpen(true)}
               showEdit={u.isOwner}
             />
-            {mockExperiences.map((exp) => (
+            {experiences.map((exp) => (
               <ExperienceItem key={exp.id} exp={exp} compact={false} />
             ))}
+            {!experiences.length && (
+              <p className="text-[13px] text-gray-400">
+                Chưa có kinh nghiệm làm việc.
+              </p>
+            )}
           </section>
 
           {/* Education */}
@@ -65,11 +82,17 @@ export default function ProfileSkillsTab() {
             <SectionHead
               title="Học vấn"
               showAdd={u.isOwner}
+              onAdd={() => setAddEduOpen(true)}
               showEdit={u.isOwner}
             />
-            {mockEducation.map((edu) => (
+            {educations.map((edu) => (
               <EducationItem key={edu.id} edu={edu} compact={false} />
             ))}
+            {!educations.length && (
+              <p className="text-[13px] text-gray-400">
+                Chưa có thông tin học vấn.
+              </p>
+            )}
           </section>
 
           {/* Skills */}
@@ -109,27 +132,6 @@ export default function ProfileSkillsTab() {
                       {sk.category} · {sk.endorsements} xác nhận
                     </div>
                   </div>
-                  {!u.isOwner && (
-                    <button
-                      onClick={() => toggleEndorse(sk.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[12.5px] font-semibold border-[1.5px] cursor-pointer transition-all
-                                  ${
-                                    sk.endorsed
-                                      ? "bg-violet-600 text-white border-violet-600"
-                                      : "bg-transparent text-gray-500 border-gray-300 hover:border-violet-600 hover:text-violet-600"
-                                  }`}
-                    >
-                      {sk.endorsed ? (
-                        <>
-                          <Check size={13} /> Đã xác nhận
-                        </>
-                      ) : (
-                        <>
-                          <ThumbsUp size={13} /> Xác nhận
-                        </>
-                      )}
-                    </button>
-                  )}
                 </div>
               ))}
             </div>
@@ -189,9 +191,18 @@ export default function ProfileSkillsTab() {
       <AddExperienceModal
         open={addExpOpen}
         onClose={() => setAddExpOpen(false)}
-        onSave={(data) => {
-          console.log("New experience:", data);
-        }}
+        companies={companies}
+        isSaving={isCreatingExperience}
+        onSave={onCreateExperience}
+      />
+
+      <AddEducationModal
+        open={addEduOpen}
+        onClose={() => setAddEduOpen(false)}
+        schools={schools}
+        fieldOfStudies={fieldOfStudies}
+        isSaving={isCreatingEducation}
+        onSave={onCreateEducation}
       />
     </div>
   );

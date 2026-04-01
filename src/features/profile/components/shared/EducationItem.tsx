@@ -1,11 +1,9 @@
 "use client";
 
-import { mockEducation } from "../../data/profileMockData";
-
-type Education = (typeof mockEducation)[0];
+import { ProfileEducationView } from "../../types";
 
 interface EducationItemProps {
-  edu: Education;
+  edu: ProfileEducationView;
   compact: boolean;
 }
 
@@ -22,7 +20,9 @@ export default function EducationItem({ edu, compact }: EducationItemProps) {
 
       {/* Body */}
       <div className="flex-1 min-w-0">
-        <div className="text-[14.5px] font-semibold text-gray-900">{edu.school}</div>
+        <div className="text-[14.5px] font-semibold text-gray-900">
+          {edu.school}
+        </div>
         <div className="text-[13px] text-gray-500 mt-0.5">
           {edu.degree} · {edu.major}
         </div>

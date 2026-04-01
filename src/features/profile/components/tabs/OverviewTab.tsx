@@ -12,38 +12,65 @@ import {
   GraduationCap,
   ArrowRight,
 } from "lucide-react";
-import {
-  mockProfileUser,
-  mockExperiences,
-  mockEducation,
-  mockSkills,
-} from "../../data/profileMockData";
+import { mockSkills } from "../../data/profileMockData";
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
-import { Tab } from "../../types";
+import {
+  ProfileEducationView,
+  ProfileExperienceView,
+  ProfileUserView,
+  Tab,
+} from "../../types";
 // import AddExperienceModal from "../models/Addexperiencemodal";
 import AddExperienceModal from "../models/AddExperienceModal/index";
+import { ExperienceFormData } from "../models/AddExperienceModal/types";
+import AddEducationModal from "../models/AddEducationModal/index";
+import { EducationFormData } from "../models/AddEducationModal/types";
 
 interface OverviewTabProps {
   onTabChange: (t: Tab) => void;
+  user: ProfileUserView;
+  experiences: ProfileExperienceView[];
+  educations: ProfileEducationView[];
+  companies: Array<{ id: string; name?: string | null }>;
+  schools: Array<{ id: string; name?: string | null }>;
+  fieldOfStudies: Array<{ id: string; name?: string | null }>;
+  onCreateExperience: (data: ExperienceFormData) => Promise<void>;
+  isCreatingExperience?: boolean;
+  onCreateEducation: (data: EducationFormData) => Promise<void>;
+  isCreatingEducation?: boolean;
 }
 
-export default function OverviewTab({ onTabChange }: OverviewTabProps) {
-  const u = mockProfileUser;
+export default function OverviewTab({
+  onTabChange,
+  user,
+  experiences,
+  educations,
+  companies,
+  schools,
+  fieldOfStudies,
+  onCreateExperience,
+  isCreatingExperience,
+  onCreateEducation,
+  isCreatingEducation,
+}: OverviewTabProps) {
+  const u = user;
   const [addExpOpen, setAddExpOpen] = useState(false);
+  const [addEduOpen, setAddEduOpen] = useState(false);
+  const topSchool = educations[0];
 
   const analyticsItems = [
-    { icon: <Users size={20} />, num: u.profileViews, label: "Lượt xem hồ sơ" },
+    { icon: <Users size={20} />, num: u.connections, label: "Kết nối" },
     {
       icon: <BarChart2 size={20} />,
-      num: u.postImpressions,
-      label: "Lượt hiển thị bài",
+      num: u.followers,
+      label: "Người theo dõi",
     },
     {
       icon: <Search size={20} />,
-      num: u.searchAppearances,
-      label: "Xuất hiện tìm kiếm",
+      num: 0,
+      label: "Xuất hiện tìm kiếm (sớm)",
     },
   ];
 
@@ -60,13 +87,13 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
             </p>
             <div className="mt-2.5">
               <a
-                href={`https://${u.website}`}
+                href={`https://jub.vn/in/${u.username}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-[13px] text-violet-600 font-medium hover:underline"
               >
                 <Link2 size={13} />
-                {u.website}
+                {`jub.vn/in/${u.username}`}
               </a>
             </div>
           </section>
@@ -79,20 +106,32 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
               onAdd={() => setAddExpOpen(true)}
               onSeeAll={() => onTabChange("profile")}
             />
-            {mockExperiences.slice(0, 2).map((exp) => (
+            {experiences.slice(0, 2).map((exp) => (
               <ExperienceItem key={exp.id} exp={exp} compact />
             ))}
+            {!experiences.length && (
+              <p className="text-[13px] text-gray-400">
+                Chưa có kinh nghiệm làm việc.
+              </p>
+            )}
           </section>
 
           {/* Education preview */}
           <section className="bg-white rounded-2xl p-5 shadow-sm">
             <SectionHead
               title="Học vấn"
+              showAdd={u.isOwner}
+              onAdd={() => setAddEduOpen(true)}
               onSeeAll={() => onTabChange("profile")}
             />
-            {mockEducation.map((edu) => (
+            {educations.map((edu) => (
               <EducationItem key={edu.id} edu={edu} compact />
             ))}
+            {!educations.length && (
+              <p className="text-[13px] text-gray-400">
+                Chưa có thông tin học vấn.
+              </p>
+            )}
           </section>
 
           {/* Skills preview */}
@@ -192,17 +231,19 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
             </div>
             <div className="px-4.5 pb-4 flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-blue-700 flex items-center justify-center text-[10px] font-extrabold text-white shrink-0">
-                UIT
+                {topSchool?.schoolLogo || "SCH"}
               </div>
               <div>
                 <Link
-                  href="/schools/uit"
+                  href="/schools"
                   className="text-[13.5px] font-semibold text-gray-900 hover:underline hover:text-violet-600 transition-colors"
                 >
-                  University of Information Technology
+                  {topSchool?.school || "Chưa cập nhật trường học"}
                 </Link>
                 <div className="text-[12px] text-gray-400 mt-0.5">
-                  Management Information Systems · 2022–2026
+                  {topSchool
+                    ? `${topSchool.major || ""} ${topSchool.startYear ? `· ${topSchool.startYear}` : ""}${topSchool.endYear ? `–${topSchool.endYear}` : ""}`
+                    : "Thêm học vấn để hoàn thiện hồ sơ"}
                 </div>
               </div>
             </div>
@@ -214,9 +255,18 @@ export default function OverviewTab({ onTabChange }: OverviewTabProps) {
       <AddExperienceModal
         open={addExpOpen}
         onClose={() => setAddExpOpen(false)}
-        onSave={(data) => {
-          console.log("New experience:", data);
-        }}
+        companies={companies}
+        isSaving={isCreatingExperience}
+        onSave={onCreateExperience}
+      />
+
+      <AddEducationModal
+        open={addEduOpen}
+        onClose={() => setAddEduOpen(false)}
+        schools={schools}
+        fieldOfStudies={fieldOfStudies}
+        isSaving={isCreatingEducation}
+        onSave={onCreateEducation}
       />
     </div>
   );
