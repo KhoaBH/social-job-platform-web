@@ -3,7 +3,7 @@
 import { Globe,MoreHorizontal, Briefcase, ThumbsUp, MessageCircle, Share2, Send, } from "lucide-react";
 
 interface Post {
-  id: number;
+  id: string;
   author: string;
   role: string;
   avatar: string;
@@ -18,7 +18,7 @@ interface Post {
 
 interface PostCardProps {
   post: Post;
-  onToggleLike: (id: number) => void;
+  onToggleLike: (id: string) => void;
 }
 
 export default function PostCard({ post, onToggleLike }: PostCardProps) {
