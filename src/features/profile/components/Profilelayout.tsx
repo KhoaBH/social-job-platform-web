@@ -93,7 +93,7 @@ export default function ProfileLayout() {
       isOwner,
       connections: myConnections.length,
       followers: myFollowers.length,
-      openToWork: true,
+      openToWork: isOwner,
     };
   }, [
     authUser,
@@ -147,6 +147,10 @@ export default function ProfileLayout() {
   );
 
   const handleCreateExperience = async (form: ExperienceFormData) => {
+    if (!isOwner) {
+      return;
+    }
+
     if (!form.startMonth || !form.startYear) {
       return;
     }
@@ -170,6 +174,10 @@ export default function ProfileLayout() {
   };
 
   const handleCreateEducation = async (form: EducationFormData) => {
+    if (!isOwner) {
+      return;
+    }
+
     await createEducation({
       schoolId: form.schoolId,
       schoolName: form.schoolName,

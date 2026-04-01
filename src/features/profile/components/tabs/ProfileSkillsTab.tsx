@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil, ThumbsUp, Check, Globe, Link2 } from "lucide-react";
+import { Pencil, Globe, Link2 } from "lucide-react";
 import { mockSkills } from "../../data/profileMockData";
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
@@ -44,7 +44,7 @@ export default function ProfileSkillsTab({
   isCreatingEducation,
 }: ProfileSkillsTabProps) {
   const u = user;
-  const [skills, setSkills] = useState(mockSkills);
+  const [skills] = useState(mockSkills);
   const [activeSkillCat, setActiveSkillCat] = useState("Tất cả");
   const [addExpOpen, setAddExpOpen] = useState(false);
   const [addEduOpen, setAddEduOpen] = useState(false);
@@ -53,22 +53,6 @@ export default function ProfileSkillsTab({
     activeSkillCat === "Tất cả"
       ? skills
       : skills.filter((s) => s.category === activeSkillCat);
-
-  const toggleEndorse = (id: number) => {
-    setSkills((prev) =>
-      prev.map((s) =>
-        s.id === id
-          ? {
-              ...s,
-              endorsed: !s.endorsed,
-              endorsements: s.endorsed
-                ? s.endorsements - 1
-                : s.endorsements + 1,
-            }
-          : s,
-      ),
-    );
-  };
 
   return (
     <div className="animate-[fadeIn_0.2s_ease]">
@@ -148,27 +132,6 @@ export default function ProfileSkillsTab({
                       {sk.category} · {sk.endorsements} xác nhận
                     </div>
                   </div>
-                  {!u.isOwner && (
-                    <button
-                      onClick={() => toggleEndorse(sk.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[12.5px] font-semibold border-[1.5px] cursor-pointer transition-all
-                                  ${
-                                    sk.endorsed
-                                      ? "bg-violet-600 text-white border-violet-600"
-                                      : "bg-transparent text-gray-500 border-gray-300 hover:border-violet-600 hover:text-violet-600"
-                                  }`}
-                    >
-                      {sk.endorsed ? (
-                        <>
-                          <Check size={13} /> Đã xác nhận
-                        </>
-                      ) : (
-                        <>
-                          <ThumbsUp size={13} /> Xác nhận
-                        </>
-                      )}
-                    </button>
-                  )}
                 </div>
               ))}
             </div>

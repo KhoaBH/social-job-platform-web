@@ -1,15 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import {
-  MapPin,
-  Pencil,
-  UserPlus,
-  UserCheck,
-  MessageCircle,
-  ChevronRight,
-} from "lucide-react";
+import { MapPin, Pencil, ChevronRight } from "lucide-react";
 // import { mockProfileUser } from "../data/profileMockData";
 import { ProfileUserView, Tab, initials } from "../types";
 import { ROUTES } from "@/constants/routes";
@@ -25,8 +17,6 @@ export default function ProfileHero({
   user,
   isLoading,
 }: ProfileHeroProps) {
-  const [followed, setFollowed] = useState(false);
-
   const u = user;
 
   return (
@@ -82,6 +72,15 @@ export default function ProfileHero({
                   <Pencil size={14} />
                 </button>
               )}
+              <span
+                className={`px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                  u.isOwner
+                    ? "bg-violet-100 text-violet-700"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {u.isOwner ? "Hồ sơ của bạn" : "Hồ sơ người khác"}
+              </span>
             </div>
             <p className="text-[14px] text-gray-500 mt-1">{u.headline}</p>
             <p className="text-[13px] text-gray-400 mt-0.5 flex items-center gap-1">
@@ -136,42 +135,15 @@ export default function ProfileHero({
               </button>
             </>
           ) : (
-            <>
-              <button
-                className="flex items-center gap-1.5 px-5 py-2 rounded-full bg-violet-600 text-white text-[13.5px] font-semibold
-                           hover:bg-violet-700 transition-all duration-150 whitespace-nowrap border-none cursor-pointer"
-              >
-                <UserPlus size={14} />
-                Kết nối
-              </button>
-              <button
-                onClick={() => setFollowed(!followed)}
-                className={`flex items-center gap-1.5 px-[18px] py-[7px] rounded-full border-[1.5px] text-[13.5px] font-semibold
-                            transition-all duration-150 whitespace-nowrap cursor-pointer
-                            ${
-                              followed
-                                ? "bg-violet-600 text-white border-violet-600"
-                                : "border-violet-600 text-violet-600 hover:bg-violet-600 hover:text-white bg-transparent"
-                            }`}
-              >
-                <UserCheck size={14} />
-                {followed ? "Đang theo dõi" : "Theo dõi"}
-              </button>
-              <button
-                className="flex items-center gap-1.5 px-4 py-[7px] rounded-full border-[1.5px] border-gray-300 text-gray-500
-                           text-[13.5px] font-medium hover:border-gray-400 hover:text-gray-800
-                           transition-all duration-150 whitespace-nowrap bg-transparent cursor-pointer"
-              >
-                <MessageCircle size={14} />
-                Nhắn tin
-              </button>
-            </>
+            <span className="px-3 py-1.5 rounded-full text-[12px] font-semibold bg-gray-100 text-gray-600 whitespace-nowrap">
+              Chế độ chỉ xem
+            </span>
           )}
         </div>
       </div>
 
       {/* Open to work banner */}
-      {u.openToWork && (
+      {u.isOwner && u.openToWork && (
         <div
           className="mx-7 mb-5 px-4 py-3 bg-green-50 border-[1.5px] border-green-300 rounded-xl
                       flex items-center gap-2.5 text-[13px]"

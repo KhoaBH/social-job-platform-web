@@ -20,6 +20,9 @@ export const appApi = createApi({
     "ProfileFollow",
     "ProfileConnection",
     "Posts",
+    "PostInteractions",
+    "PostComments",
+    "CommentInteractions",
   ],
   endpoints: () => ({}),
 });

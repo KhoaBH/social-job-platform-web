@@ -1,5 +1,6 @@
 // components.tsx
 import { ChevronDown } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 export const MONTHS = [
   "1",
@@ -80,35 +81,90 @@ export function SelectInput({
     typeof opt === "string" ? { label: opt, value: opt } : opt,
   );
 
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  const selectedLabel = useMemo(() => {
+    const selected = normalizedOptions.find((opt) => opt.value === value);
+    return selected?.label ?? "";
+  }, [normalizedOptions, value]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onPointerDown = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+
+    const onEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onEscape);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onEscape);
+    };
+  }, [open]);
+
   return (
     <div>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          style={{ colorScheme: "light" }}
-          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white
+      <div className="relative" ref={rootRef}>
+        <button
+          type="button"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          onClick={() => setOpen((prev) => !prev)}
+          className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-left
                      text-[13.5px] text-gray-800 appearance-none
                      focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent
-                     transition-colors duration-150 cursor-pointer pr-10"
+                     transition-[box-shadow,border-color,background-color] duration-150 ease-out cursor-pointer pr-10"
         >
-          <option value="" disabled hidden>
-            {placeholder ?? "Vui lòng chọn"}
-          </option>
-          {normalizedOptions.map((opt) => (
-            <option
-              key={opt.value}
-              value={opt.value}
-              style={{ backgroundColor: "#ffffff", color: "#111827" }}
-            >
-              {opt.label}
-            </option>
-          ))}
-        </select>
+          <span className={selectedLabel ? "text-gray-800" : "text-gray-400"}>
+            {selectedLabel || placeholder || "Vui lòng chọn"}
+          </span>
+        </button>
         <ChevronDown
           size={15}
-          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          className={`absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none transition-transform duration-150 ${
+            open ? "rotate-180" : ""
+          }`}
         />
+
+        {open && (
+          <div
+            role="listbox"
+            className="absolute z-50 mt-1 w-full rounded-xl border border-gray-200 bg-white py-1 shadow-lg max-h-56 overflow-auto animate-[fadeIn_0.12s_ease]"
+          >
+            {normalizedOptions.map((opt) => {
+              const isSelected = opt.value === value;
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => {
+                    onChange(opt.value);
+                    setOpen(false);
+                  }}
+                  className={`w-full px-3.5 py-2 text-left text-[13.5px] transition-colors ${
+                    isSelected
+                      ? "bg-violet-50 text-violet-700 font-medium"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
       {hint && <p className="mt-1 text-[11.5px] text-gray-400">{hint}</p>}
     </div>

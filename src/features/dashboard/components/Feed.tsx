@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useCreatePostMutation, useGetAllPostsQuery } from "../dashboardApi";
 import Composer from "./Composer";
 import PostCard from "./PostCard";
@@ -13,19 +13,12 @@ interface FeedProps {
 export default function Feed({ initials, userFullName }: FeedProps) {
   const { data: posts = [], isLoading } = useGetAllPostsQuery();
   const [createPost, { isLoading: isCreatingPost }] = useCreatePostMutation();
-  const [likedIds, setLikedIds] = useState<string[]>([]);
 
   const handleCreatePost = async (content: string) => {
     await createPost({
       content,
       visibility: "PUBLIC",
     }).unwrap();
-  };
-
-  const toggleLike = (id: string) => {
-    setLikedIds((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
-    );
   };
 
   const mappedPosts = useMemo(
@@ -39,6 +32,7 @@ export default function Feed({ initials, userFullName }: FeedProps) {
 
         return {
           id: post.id,
+          authorId: post.author?.id || undefined,
           author: authorName,
           role: "",
           avatar: initials(authorName),
@@ -47,13 +41,10 @@ export default function Feed({ initials, userFullName }: FeedProps) {
             ? new Date(post.createdAt).toLocaleString("vi-VN")
             : "Vừa xong",
           content: post.content || "",
-          likes: likedIds.includes(post.id) ? 1 : 0,
-          comments: 0,
-          liked: likedIds.includes(post.id),
           isJob: false,
         };
       }),
-    [posts, likedIds, initials],
+    [posts, initials],
   );
 
   return (
@@ -75,7 +66,7 @@ export default function Feed({ initials, userFullName }: FeedProps) {
         </div>
       )}
       {mappedPosts.map((post) => (
-        <PostCard key={post.id} post={post} onToggleLike={toggleLike} />
+        <PostCard key={post.id} post={post} />
       ))}
     </div>
   );
