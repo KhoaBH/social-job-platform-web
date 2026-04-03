@@ -60,11 +60,14 @@ export default function Navbar({
 
         {/* Nav links */}
         <div className="flex items-center ml-auto gap-1">
-          {navLinks.map((nl, i) => (
-            <button
-              key={i}
-              onClick={() => handleNavClick(i)}
-              className={`flex flex-col items-center gap-0.5 px-4 h-14 justify-center
+          {navLinks.map((nl, i) => {
+            const Icon = nl.icon;
+
+            return (
+              <button
+                key={i}
+                onClick={() => handleNavClick(i)}
+                className={`flex flex-col items-center gap-0.5 px-4 h-14 justify-center
                           text-[11.5px] cursor-pointer border-none border-b-2 bg-transparent
                           font-[inherit] font-medium transition-all duration-150
                           ${
@@ -72,11 +75,14 @@ export default function Navbar({
                               ? "text-[#111827] border-[#111827]"
                               : "text-[#4B5563] border-transparent hover:text-[#111827]"
                           }`}
-            >
-              <span className="text-xl leading-none">{nl.icon}</span>
-              <span>{nl.label}</span>
-            </button>
-          ))}
+              >
+                <span className="leading-none text-[18px]">
+                  <Icon size={17} strokeWidth={1.8} />
+                </span>
+                <span>{nl.label}</span>
+              </button>
+            );
+          })}
 
           {/* Avatar → profile link */}
           <Link

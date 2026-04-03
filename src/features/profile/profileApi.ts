@@ -62,6 +62,39 @@ export interface BackendFollow {
   followee?: { id: string } | null;
 }
 
+export interface BackendConnectionUser {
+  id: string;
+}
+
+export interface BackendConnection {
+  id: string;
+  requester?: BackendConnectionUser | null;
+  addressee?: BackendConnectionUser | null;
+  status: "PENDING" | "ACCEPTED" | "REJECTED" | "BLOCKED" | string;
+}
+
+export interface BackendSkillCategory {
+  id: string;
+  name?: string | null;
+}
+
+export interface BackendSkill {
+  id: string;
+  name?: string | null;
+  category?: BackendSkillCategory | null;
+}
+
+export interface BackendUserSkill {
+  id: string;
+  level?: number | null;
+  skill?: BackendSkill | null;
+}
+
+export interface CreateUserSkillPayload {
+  skillId: string;
+  level: number;
+}
+
 export interface CreateEducationPayload {
   schoolId?: string;
   schoolName?: string;
@@ -134,6 +167,28 @@ export const profileApi = appApi.injectEndpoints({
     getFieldOfStudies: builder.query<BackendFieldOfStudy[], void>({
       query: () => "/field-of-studies",
     }),
+    getSkills: builder.query<BackendSkill[], void>({
+      query: () => "/skills",
+      providesTags: [{ type: "ProfileSkill", id: "SKILL_LIST" }],
+    }),
+    getUserSkills: builder.query<BackendUserSkill[], string>({
+      query: (userId) => `/skills/user/${userId}`,
+      providesTags: (_result, _error, userId) => [
+        { type: "ProfileSkill", id: `USER_${userId}` },
+      ],
+    }),
+    createUserSkill: builder.mutation<BackendUserSkill, CreateUserSkillPayload>(
+      {
+        query: (body) => ({
+          url: "/skills/user",
+          method: "POST",
+          body,
+        }),
+        invalidatesTags: (_result, _error, _arg) => [
+          { type: "ProfileSkill", id: "SKILL_LIST" },
+        ],
+      },
+    ),
     getMyFollowing: builder.query<BackendFollow[], void>({
       query: () => "/follows/me/following",
       providesTags: [{ type: "ProfileFollow", id: "ME_FOLLOWING" }],
@@ -142,7 +197,7 @@ export const profileApi = appApi.injectEndpoints({
       query: () => "/follows/me/followers",
       providesTags: [{ type: "ProfileFollow", id: "ME_FOLLOWERS" }],
     }),
-    getMyConnections: builder.query<Array<{ id: string }>, void>({
+    getMyConnections: builder.query<BackendConnection[], void>({
       query: () => "/connections/me",
       providesTags: [{ type: "ProfileConnection", id: "ME" }],
     }),
@@ -159,6 +214,9 @@ export const {
   useGetCompaniesQuery,
   useGetSchoolsQuery,
   useGetFieldOfStudiesQuery,
+  useGetSkillsQuery,
+  useGetUserSkillsQuery,
+  useCreateUserSkillMutation,
   useGetMyFollowingQuery,
   useGetMyFollowersQuery,
   useGetMyConnectionsQuery,

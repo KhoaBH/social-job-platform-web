@@ -4,7 +4,10 @@ import { useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { useSendConnectionRequestMutation } from "@/features/dashboard/dashboardApi";
 import {
+  CreateUserSkillPayload,
+  useCreateUserSkillMutation,
   useCreateEducationMutation,
   useCreateWorkExperienceMutation,
   useGetCompaniesQuery,
@@ -13,14 +16,20 @@ import {
   useGetMyConnectionsQuery,
   useGetMyFollowersQuery,
   useGetSchoolsQuery,
+  useGetSkillsQuery,
+  useGetUserSkillsQuery,
   useGetUserByIdQuery,
   useGetWorkExperiencesByUserQuery,
 } from "../profileApi";
 import {
+  ConnectionRelationshipState,
   ProfileEducationView,
   ProfileExperienceView,
+  ProfileSkillView,
   ProfileUserView,
+  SkillOptionView,
   Tab,
+  normalizeSkillLevel,
   randomSoftColorFromString,
   toMonthYear,
 } from "../types";
@@ -35,11 +44,16 @@ import NetworkTab from "./tabs/NetworkTab";
 
 export default function ProfileLayout() {
   const [activeTab, setActiveTab] = useState<Tab>("overview");
+  const [locallySentConnectionIds, setLocallySentConnectionIds] = useState<
+    string[]
+  >([]);
   const params = useParams<{ userId: string }>();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const routeUserId = typeof params.userId === "string" ? params.userId : "";
   const targetUserId = routeUserId || authUser?.id || "";
   const isOwner = Boolean(authUser?.id && authUser.id === targetUserId);
+  const [sendConnectionRequest, { isLoading: isSendingConnectionRequest }] =
+    useSendConnectionRequestMutation();
 
   const { data: userData, isLoading: isLoadingUser } = useGetUserByIdQuery(
     targetUserId,
@@ -61,19 +75,71 @@ export default function ProfileLayout() {
   const { data: companies = [] } = useGetCompaniesQuery();
   const { data: schools = [] } = useGetSchoolsQuery();
   const { data: fieldOfStudies = [] } = useGetFieldOfStudiesQuery();
+  const { data: skills = [] } = useGetSkillsQuery();
+  const { data: userSkills = [], refetch: refetchUserSkills } =
+    useGetUserSkillsQuery(targetUserId, {
+      skip: !targetUserId,
+    });
 
   const { data: myFollowers = [] } = useGetMyFollowersQuery(undefined, {
     skip: !isOwner,
   });
 
   const { data: myConnections = [] } = useGetMyConnectionsQuery(undefined, {
-    skip: !isOwner,
+    skip: !authUser?.id,
   });
 
   const [createWorkExperience, { isLoading: isCreatingExperience }] =
     useCreateWorkExperienceMutation();
   const [createEducation, { isLoading: isCreatingEducation }] =
     useCreateEducationMutation();
+  const [createUserSkill, { isLoading: isCreatingUserSkill }] =
+    useCreateUserSkillMutation();
+
+  const currentConnectionState: ConnectionRelationshipState = useMemo(() => {
+    if (!authUser?.id || !targetUserId || authUser.id === targetUserId) {
+      return "none";
+    }
+
+    const outgoingConnection = myConnections.find(
+      (connection) =>
+        connection.requester?.id === authUser.id &&
+        connection.addressee?.id === targetUserId,
+    );
+    const incomingConnection = myConnections.find(
+      (connection) =>
+        connection.requester?.id === targetUserId &&
+        connection.addressee?.id === authUser.id,
+    );
+
+    if (
+      outgoingConnection?.status === "ACCEPTED" ||
+      incomingConnection?.status === "ACCEPTED"
+    ) {
+      return "friends";
+    }
+
+    if (outgoingConnection?.status === "PENDING") {
+      return "pending_sent";
+    }
+
+    if (incomingConnection?.status === "PENDING") {
+      return "pending_received";
+    }
+
+    if (locallySentConnectionIds.includes(targetUserId)) {
+      return "pending_sent";
+    }
+
+    return "none";
+  }, [authUser?.id, locallySentConnectionIds, myConnections, targetUserId]);
+
+  const acceptedConnectionsCount = useMemo(
+    () =>
+      myConnections.filter((connection) => connection.status === "ACCEPTED")
+        .length,
+    [myConnections],
+  );
 
   const profileUser: ProfileUserView = useMemo(() => {
     const fullName = userData?.fullName || authUser?.fullName || "Người dùng";
@@ -89,20 +155,39 @@ export default function ProfileLayout() {
       bio:
         userData?.summary ||
         userData?.profileText ||
-        "Chưa có phần giới thiệu. Hãy cập nhật hồ sơ để tăng khả năng kết nối.",
+        "Chưa có phần giới thiệu. Hãy cập nhật hồ sơ để tăng khả năng kết bạn.",
       isOwner,
-      connections: myConnections.length,
+      connections: isOwner ? acceptedConnectionsCount : 0,
       followers: myFollowers.length,
       openToWork: isOwner,
     };
   }, [
     authUser,
+    acceptedConnectionsCount,
     isOwner,
-    myConnections.length,
     myFollowers.length,
     targetUserId,
     userData,
   ]);
+
+  const handleSendConnectionRequest = async () => {
+    if (!authUser?.id || !targetUserId || isOwner) {
+      return;
+    }
+
+    if (currentConnectionState !== "none") {
+      return;
+    }
+
+    try {
+      await sendConnectionRequest({ addresseeId: targetUserId }).unwrap();
+      setLocallySentConnectionIds((prev) =>
+        prev.includes(targetUserId) ? prev : [...prev, targetUserId],
+      );
+    } catch {
+      // Keep silent for now; can be replaced with a toast later.
+    }
+  };
 
   const experienceViews: ProfileExperienceView[] = useMemo(
     () =>
@@ -144,6 +229,32 @@ export default function ProfileLayout() {
         };
       }),
     [educations],
+  );
+
+  const availableSkillOptions: SkillOptionView[] = useMemo(
+    () =>
+      skills
+        .filter((skill) => Boolean(skill.id) && Boolean(skill.name))
+        .map((skill) => ({
+          id: skill.id,
+          name: skill.name || "",
+          category: skill.category?.name || "Khác",
+        })),
+    [skills],
+  );
+
+  const skillViews: ProfileSkillView[] = useMemo(
+    () =>
+      userSkills
+        .filter((item) => Boolean(item.id) && Boolean(item.skill?.id))
+        .map((item) => ({
+          id: item.id,
+          skillId: item.skill?.id || "",
+          name: item.skill?.name || "Kỹ năng",
+          category: item.skill?.category?.name || "Khác",
+          level: normalizeSkillLevel(item.level),
+        })),
+    [userSkills],
   );
 
   const handleCreateExperience = async (form: ExperienceFormData) => {
@@ -190,6 +301,15 @@ export default function ProfileLayout() {
     await refetchEducations();
   };
 
+  const handleCreateUserSkill = async (payload: CreateUserSkillPayload) => {
+    if (!isOwner) {
+      return;
+    }
+
+    await createUserSkill(payload).unwrap();
+    await refetchUserSkills();
+  };
+
   return (
     <>
       {/* Google Font — DM Sans + DM Serif Display */}
@@ -208,6 +328,11 @@ export default function ProfileLayout() {
             onTabChange={setActiveTab}
             user={profileUser}
             isLoading={isLoadingUser}
+            connectionState={currentConnectionState}
+            isSendingConnectionRequest={isSendingConnectionRequest}
+            onSendConnectionRequest={
+              authUser?.id && !isOwner ? handleSendConnectionRequest : undefined
+            }
           />
           <ProfileTabBar active={activeTab} onChange={setActiveTab} />
 
@@ -217,6 +342,8 @@ export default function ProfileLayout() {
               user={profileUser}
               experiences={experienceViews}
               educations={educationViews}
+              skills={skillViews}
+              allSkills={availableSkillOptions}
               companies={companies}
               schools={schools}
               fieldOfStudies={fieldOfStudies}
@@ -224,6 +351,8 @@ export default function ProfileLayout() {
               isCreatingExperience={isCreatingExperience}
               onCreateEducation={handleCreateEducation}
               isCreatingEducation={isCreatingEducation}
+              onCreateUserSkill={handleCreateUserSkill}
+              isCreatingUserSkill={isCreatingUserSkill}
             />
           )}
           {activeTab === "profile" && (
@@ -231,6 +360,8 @@ export default function ProfileLayout() {
               user={profileUser}
               experiences={experienceViews}
               educations={educationViews}
+              skills={skillViews}
+              allSkills={availableSkillOptions}
               companies={companies}
               schools={schools}
               fieldOfStudies={fieldOfStudies}
@@ -238,6 +369,8 @@ export default function ProfileLayout() {
               isCreatingExperience={isCreatingExperience}
               onCreateEducation={handleCreateEducation}
               isCreatingEducation={isCreatingEducation}
+              onCreateUserSkill={handleCreateUserSkill}
+              isCreatingUserSkill={isCreatingUserSkill}
             />
           )}
           {activeTab === "activity" && <ActivityTab />}

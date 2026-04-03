@@ -139,7 +139,8 @@ export function SelectInput({
         {open && (
           <div
             role="listbox"
-            className="absolute z-50 mt-1 w-full rounded-xl border border-gray-200 bg-white py-1 shadow-lg max-h-56 overflow-auto animate-[fadeIn_0.12s_ease]"
+            className="absolute z-50 mt-1 w-full rounded-xl border border-gray-200 bg-white py-1 shadow-lg max-h-56 overflow-y-scroll animate-[fadeIn_0.12s_ease] [scrollbar-width:thin]"
+            style={{ scrollbarGutter: "stable" }}
           >
             {normalizedOptions.map((opt) => {
               const isSelected = opt.value === value;

@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pencil, Globe, Link2 } from "lucide-react";
-import { mockSkills } from "../../data/profileMockData";
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
@@ -10,18 +9,25 @@ import AddExperienceModal from "../models/AddExperienceModal/index";
 import {
   ProfileEducationView,
   ProfileExperienceView,
+  ProfileSkillView,
   ProfileUserView,
+  SKILL_LEVEL_LABELS,
+  SkillOptionView,
 } from "../../types";
 import { ExperienceFormData } from "../models/AddExperienceModal/types";
 import AddEducationModal from "../models/AddEducationModal/index";
 import { EducationFormData } from "../models/AddEducationModal/types";
+import AddSkillModal from "../models/AddSkillModal";
+import { AddSkillFormData } from "../models/AddSkillModal/types";
 
-const SKILL_CATS = ["Tất cả", "Kỹ thuật", "Thiết kế", "Kỹ năng mềm"];
+const DEFAULT_CATEGORY = "Tất cả";
 
 interface ProfileSkillsTabProps {
   user: ProfileUserView;
   experiences: ProfileExperienceView[];
   educations: ProfileEducationView[];
+  skills: ProfileSkillView[];
+  allSkills: SkillOptionView[];
   companies: Array<{ id: string; name?: string | null }>;
   schools: Array<{ id: string; name?: string | null }>;
   fieldOfStudies: Array<{ id: string; name?: string | null }>;
@@ -29,12 +35,16 @@ interface ProfileSkillsTabProps {
   isCreatingExperience?: boolean;
   onCreateEducation: (data: EducationFormData) => Promise<void>;
   isCreatingEducation?: boolean;
+  onCreateUserSkill: (data: AddSkillFormData) => Promise<void>;
+  isCreatingUserSkill?: boolean;
 }
 
 export default function ProfileSkillsTab({
   user,
   experiences,
   educations,
+  skills,
+  allSkills,
   companies,
   schools,
   fieldOfStudies,
@@ -42,17 +52,42 @@ export default function ProfileSkillsTab({
   isCreatingExperience,
   onCreateEducation,
   isCreatingEducation,
+  onCreateUserSkill,
+  isCreatingUserSkill,
 }: ProfileSkillsTabProps) {
   const u = user;
-  const [skills] = useState(mockSkills);
-  const [activeSkillCat, setActiveSkillCat] = useState("Tất cả");
+  const [activeSkillCat, setActiveSkillCat] = useState(DEFAULT_CATEGORY);
   const [addExpOpen, setAddExpOpen] = useState(false);
   const [addEduOpen, setAddEduOpen] = useState(false);
+  const [addSkillOpen, setAddSkillOpen] = useState(false);
+
+  const skillCategories = useMemo(() => {
+    const categories = Array.from(
+      new Set(skills.map((skill) => skill.category).filter(Boolean)),
+    );
+
+    return [DEFAULT_CATEGORY, ...categories];
+  }, [skills]);
+
+  const selectedSkillIds = useMemo(
+    () => new Set(skills.map((skill) => skill.skillId)),
+    [skills],
+  );
+
+  const availableSkillsToAdd = useMemo(
+    () => allSkills.filter((skill) => !selectedSkillIds.has(skill.id)),
+    [allSkills, selectedSkillIds],
+  );
 
   const filtered =
-    activeSkillCat === "Tất cả"
+    activeSkillCat === DEFAULT_CATEGORY
       ? skills
       : skills.filter((s) => s.category === activeSkillCat);
+
+  const handleAddSkill = async (data: AddSkillFormData) => {
+    await onCreateUserSkill(data);
+    setAddSkillOpen(false);
+  };
 
   return (
     <div className="animate-[fadeIn_0.2s_ease]">
@@ -97,11 +132,15 @@ export default function ProfileSkillsTab({
 
           {/* Skills */}
           <section className="bg-white rounded-2xl p-5 shadow-sm">
-            <SectionHead title="Kỹ năng" showAdd={u.isOwner} />
+            <SectionHead
+              title="Kỹ năng"
+              showAdd={u.isOwner}
+              onAdd={() => setAddSkillOpen(true)}
+            />
 
             {/* Category filter */}
             <div className="flex gap-1.5 mb-3.5 flex-wrap">
-              {SKILL_CATS.map((c) => (
+              {skillCategories.map((c) => (
                 <button
                   key={c}
                   onClick={() => setActiveSkillCat(c)}
@@ -119,6 +158,9 @@ export default function ProfileSkillsTab({
 
             {/* Skills list */}
             <div className="flex flex-col">
+              {!filtered.length && (
+                <p className="text-[13px] text-gray-400">Chưa có kỹ năng.</p>
+              )}
               {filtered.map((sk) => (
                 <div
                   key={sk.id}
@@ -129,7 +171,7 @@ export default function ProfileSkillsTab({
                       {sk.name}
                     </div>
                     <div className="text-[12px] text-gray-400 mt-0.5">
-                      {sk.category} · {sk.endorsements} xác nhận
+                      {sk.category} · {SKILL_LEVEL_LABELS[sk.level]}
                     </div>
                   </div>
                 </div>
@@ -203,6 +245,14 @@ export default function ProfileSkillsTab({
         fieldOfStudies={fieldOfStudies}
         isSaving={isCreatingEducation}
         onSave={onCreateEducation}
+      />
+
+      <AddSkillModal
+        open={addSkillOpen}
+        onClose={() => setAddSkillOpen(false)}
+        availableSkills={availableSkillsToAdd}
+        isSaving={isCreatingUserSkill}
+        onSave={handleAddSkill}
       />
     </div>
   );

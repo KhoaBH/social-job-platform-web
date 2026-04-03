@@ -1,6 +1,13 @@
 "use client";
 
-import { Bookmark, ClipboardList, Users, Newspaper, GraduationCap, Star, } from "lucide-react";
+import {
+  Bookmark,
+  ClipboardList,
+  Users,
+  Newspaper,
+  GraduationCap,
+  Star,
+} from "lucide-react";
 
 interface LeftSidebarProps {
   initials: (name: string) => string;
@@ -15,7 +22,10 @@ const shortcuts = [
   { icon: <GraduationCap size={16} />, label: "Khoá học & Chứng chỉ" },
 ];
 
-export default function LeftSidebar({ initials, userFullName }: LeftSidebarProps) {
+export default function LeftSidebar({
+  initials,
+  userFullName,
+}: LeftSidebarProps) {
   return (
     <div className="flex flex-col gap-2.5">
       {/* Profile card */}
@@ -26,13 +36,17 @@ export default function LeftSidebar({ initials, userFullName }: LeftSidebarProps
         {/* Body */}
         <div className="px-3.5 pb-3.5">
           {/* Avatar */}
-          <div className="w-15 h-15 rounded-full bg-[#0A66C2] flex items-center justify-center
+          <div
+            className="w-15 h-15 rounded-full bg-[#0A66C2] flex items-center justify-center
                           text-xl font-bold text-white border-[3px] border-white
-                          -mt-7.5 mb-2">
+                          -mt-7.5 mb-2"
+          >
             {initials(userFullName)}
           </div>
 
-          <div className="text-[15px] font-bold">{userFullName || "Người dùng"}</div>
+          <div className="text-[15px] font-bold">
+            {userFullName || "Người dùng"}
+          </div>
           <div className="text-[12px] text-[#555] mt-0.5 leading-[1.4]">
             Tìm việc tích cực · IT & Tech
           </div>
@@ -42,16 +56,21 @@ export default function LeftSidebar({ initials, userFullName }: LeftSidebarProps
           {[
             { label: "Người xem hồ sơ", value: "48" },
             { label: "Lượt hiển thị bài", value: "312" },
-            { label: "Kết nối", value: "127" },
+            { label: "Bạn bè", value: "127" },
           ].map(({ label, value }) => (
-            <div key={label} className="flex justify-between text-[12.5px] py-0.5">
+            <div
+              key={label}
+              className="flex justify-between text-[12.5px] py-0.5"
+            >
               <span className="text-[#555]">{label}</span>
               <span className="font-bold text-[#0A66C2]">{value}</span>
             </div>
           ))}
 
-          <div className="flex items-center gap-1.5 mt-2.5 px-2.5 py-2 bg-[#FEF9EC]
-                          rounded-lg text-[12px] text-[#8A6800] font-semibold cursor-pointer">
+          <div
+            className="flex items-center gap-1.5 mt-2.5 px-2.5 py-2 bg-[#FEF9EC]
+                          rounded-lg text-[12px] text-[#8A6800] font-semibold cursor-pointer"
+          >
             <Star size={14} />
             Thử Jub Premium miễn phí
           </div>

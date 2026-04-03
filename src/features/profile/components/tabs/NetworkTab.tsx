@@ -44,7 +44,7 @@ export default function NetworkTab() {
                   fontWeight: 400,
                 }}
               >
-                Kết nối ({mockConnections.length})
+                Bạn bè ({mockConnections.length})
               </h2>
             </div>
             <div className="grid grid-cols-3 gap-3 max-[600px]:grid-cols-2">
@@ -74,7 +74,7 @@ export default function NetworkTab() {
                   </div>
                   <div className="flex items-center gap-1 text-[11px] text-gray-400">
                     <Users size={11} />
-                    {person.mutual} kết nối chung
+                    {person.mutual} bạn bè chung
                   </div>
                   <button
                     onClick={() => toggleConnect(person.id)}
@@ -87,11 +87,11 @@ export default function NetworkTab() {
                   >
                     {connected.includes(person.id) ? (
                       <>
-                        <Check size={12} /> Đã kết nối
+                        <Check size={12} /> Đã là bạn bè
                       </>
                     ) : (
                       <>
-                        <UserPlus size={12} /> Kết nối
+                        <UserPlus size={12} /> Kết bạn
                       </>
                     )}
                   </button>

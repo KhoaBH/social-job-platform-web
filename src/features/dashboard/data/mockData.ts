@@ -1,3 +1,11 @@
+import {
+  Bell,
+  Briefcase,
+  Home,
+  MessageCircle,
+  Users,
+} from "lucide-react";
+
 export const mockPosts = [
   {
     id: 1,
@@ -56,11 +64,11 @@ export const jobSuggestions = [
 ];
 
 export const navLinks = [
-  { label: "Trang chủ", icon: "🏠" },
-  { label: "Việc làm", icon: "💼" },
-  { label: "Mạng lưới", icon: "👥" },
-  { label: "Tin nhắn", icon: "💬" },
-  { label: "Thông báo", icon: "🔔" },
+  { label: "Trang chủ", icon: Home },
+  { label: "Việc làm", icon: Briefcase },
+  { label: "Mạng lưới", icon: Users },
+  { label: "Tin nhắn", icon: MessageCircle },
+  { label: "Thông báo", icon: Bell },
 ];
 
 export const trendingTopics = [

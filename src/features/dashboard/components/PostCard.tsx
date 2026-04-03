@@ -276,9 +276,11 @@ export default function PostCard({ post }: PostCardProps) {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [visibleRootComments, setVisibleRootComments] = useState(3);
+  const [likedOverride, setLikedOverride] = useState<boolean | null>(null);
   const authUser = useSelector((state: RootState) => state.auth.user);
 
-  const { data: interactions = [] } = useGetPostInteractionsQuery(post.id);
+  const { data: interactions = [], refetch: refetchPostInteractions } =
+    useGetPostInteractionsQuery(post.id);
   const { data: commentTree = [] } = useGetPostCommentTreeQuery(post.id);
   const [likePost, { isLoading: isLiking }] = useLikePostMutation();
   const [unlikePost, { isLoading: isUnliking }] = useUnlikePostMutation();
@@ -296,10 +298,17 @@ export default function PostCard({ post }: PostCardProps) {
     return map;
   }, [users]);
 
-  const liked = Boolean(
+  const serverLiked = Boolean(
     authUser?.id && interactions.some((item) => item.userId === authUser.id),
   );
-  const likesCount = interactions.length;
+  const liked = likedOverride ?? serverLiked;
+  const likesCount =
+    interactions.length +
+    (likedOverride !== null && likedOverride !== serverLiked
+      ? likedOverride
+        ? 1
+        : -1
+      : 0);
 
   const commentsCount = useMemo(
     () => countAllComments(commentTree as CommentNode[]),
@@ -326,12 +335,19 @@ export default function PostCard({ post }: PostCardProps) {
       return;
     }
 
-    if (liked) {
-      await unlikePost(post.id).unwrap();
-      return;
-    }
+    const nextLiked = !liked;
+    setLikedOverride(nextLiked);
 
-    await likePost(post.id).unwrap();
+    try {
+      if (nextLiked) {
+        await likePost(post.id).unwrap();
+      } else {
+        await unlikePost(post.id).unwrap();
+      }
+    } catch {
+      setLikedOverride(null);
+      await refetchPostInteractions();
+    }
   };
 
   const handleCreateComment = async () => {

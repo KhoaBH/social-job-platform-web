@@ -1,7 +1,7 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import { ArrowRight, UserPlus, Check } from "lucide-react";
 import { RootState } from "@/store";
@@ -10,21 +10,65 @@ import {
   useGetAllUsersQuery,
   useSendConnectionRequestMutation,
 } from "../dashboardApi";
+import {
+  BackendConnection,
+  useGetMyConnectionsQuery,
+} from "@/features/profile/profileApi";
 import { jobSuggestions, trendingTopics } from "../data/mockData";
 
 export default function RightSidebar() {
   const [sentRequests, setSentRequests] = useState<string[]>([]);
   const [pendingRequestIds, setPendingRequestIds] = useState<string[]>([]);
+  const [connectionsSnapshot, setConnectionsSnapshot] = useState<
+    BackendConnection[]
+  >([]);
+  const [hasCapturedConnections, setHasCapturedConnections] = useState(false);
   const authUser = useSelector((state: RootState) => state.auth.user);
   const {
     data: users = [],
     isLoading: isLoadingUsers,
     isError: isUsersError,
   } = useGetAllUsersQuery();
+  const { data: myConnections = [], isLoading: isLoadingConnections } =
+    useGetMyConnectionsQuery(undefined, {
+      skip: !authUser?.id,
+    });
   const [sendConnectionRequest] = useSendConnectionRequestMutation();
 
+  useEffect(() => {
+    if (hasCapturedConnections || isLoadingConnections) {
+      return;
+    }
+
+    setConnectionsSnapshot(myConnections);
+    setHasCapturedConnections(true);
+  }, [hasCapturedConnections, isLoadingConnections, myConnections]);
+
+  const excludedUserIds = useMemo(() => {
+    const ids = new Set<string>();
+
+    if (authUser?.id) {
+      ids.add(authUser.id);
+    }
+
+    connectionsSnapshot.forEach((connection) => {
+      const requesterId = connection.requester?.id;
+      const addresseeId = connection.addressee?.id;
+
+      if (requesterId) {
+        ids.add(requesterId);
+      }
+
+      if (addresseeId) {
+        ids.add(addresseeId);
+      }
+    });
+
+    return ids;
+  }, [authUser?.id, connectionsSnapshot]);
+
   const suggestedConnections = users
-    .filter((user) => user.id !== authUser?.id)
+    .filter((user) => !excludedUserIds.has(user.id))
     .slice(0, 5)
     .map((user) => {
       const displayName =
@@ -137,7 +181,7 @@ export default function RightSidebar() {
           !isUsersError &&
           suggestedConnections.length === 0 && (
             <div className="px-4 py-3 border-t border-[#E4E4E7] text-[12px] text-[#666]">
-              Chưa có gợi ý kết nối.
+              Chưa có gợi ý bạn bè.
             </div>
           )}
         {!isLoadingUsers &&
@@ -169,7 +213,7 @@ export default function RightSidebar() {
                   {person.role}
                 </div>
                 <div className="text-[11.5px] text-[#999]">
-                  {person.mutual} kết nối chung
+                  {person.mutual} bạn bè chung
                 </div>
               </div>
               <button

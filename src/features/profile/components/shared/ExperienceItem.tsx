@@ -31,22 +31,27 @@ export default function ExperienceItem({ exp, compact }: ExperienceItemProps) {
         </div>
         <div className="text-[12px] text-gray-400">📍 {exp.location}</div>
 
+        {exp.description && (
+          <p
+            className={`text-[13px] text-gray-500 mt-1.5 leading-relaxed ${
+              compact ? "line-clamp-2" : ""
+            }`}
+          >
+            {exp.description}
+          </p>
+        )}
+
         {!compact && (
-          <>
-            <p className="text-[13px] text-gray-500 mt-1.5 leading-relaxed">
-              {exp.description}
-            </p>
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {exp.skills.map((s) => (
-                <span
-                  key={s}
-                  className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-violet-50 text-violet-600 text-[11.5px] font-medium"
-                >
-                  {s}
-                </span>
-              ))}
-            </div>
-          </>
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {exp.skills.map((s) => (
+              <span
+                key={s}
+                className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-violet-50 text-violet-600 text-[11.5px] font-medium"
+              >
+                {s}
+              </span>
+            ))}
+          </div>
         )}
       </div>
     </div>

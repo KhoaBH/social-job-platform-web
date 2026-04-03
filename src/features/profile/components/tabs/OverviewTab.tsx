@@ -12,14 +12,15 @@ import {
   GraduationCap,
   ArrowRight,
 } from "lucide-react";
-import { mockSkills } from "../../data/profileMockData";
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
 import {
   ProfileEducationView,
   ProfileExperienceView,
+  ProfileSkillView,
   ProfileUserView,
+  SKILL_LEVEL_LABELS,
   Tab,
 } from "../../types";
 // import AddExperienceModal from "../models/Addexperiencemodal";
@@ -27,12 +28,16 @@ import AddExperienceModal from "../models/AddExperienceModal/index";
 import { ExperienceFormData } from "../models/AddExperienceModal/types";
 import AddEducationModal from "../models/AddEducationModal/index";
 import { EducationFormData } from "../models/AddEducationModal/types";
+import AddSkillModal from "../models/AddSkillModal";
+import { AddSkillFormData } from "../models/AddSkillModal/types";
 
 interface OverviewTabProps {
   onTabChange: (t: Tab) => void;
   user: ProfileUserView;
   experiences: ProfileExperienceView[];
   educations: ProfileEducationView[];
+  skills: ProfileSkillView[];
+  allSkills: Array<{ id: string; name: string; category: string }>;
   companies: Array<{ id: string; name?: string | null }>;
   schools: Array<{ id: string; name?: string | null }>;
   fieldOfStudies: Array<{ id: string; name?: string | null }>;
@@ -40,6 +45,8 @@ interface OverviewTabProps {
   isCreatingExperience?: boolean;
   onCreateEducation: (data: EducationFormData) => Promise<void>;
   isCreatingEducation?: boolean;
+  onCreateUserSkill: (data: AddSkillFormData) => Promise<void>;
+  isCreatingUserSkill?: boolean;
 }
 
 export default function OverviewTab({
@@ -47,6 +54,8 @@ export default function OverviewTab({
   user,
   experiences,
   educations,
+  skills,
+  allSkills,
   companies,
   schools,
   fieldOfStudies,
@@ -54,14 +63,27 @@ export default function OverviewTab({
   isCreatingExperience,
   onCreateEducation,
   isCreatingEducation,
+  onCreateUserSkill,
+  isCreatingUserSkill,
 }: OverviewTabProps) {
   const u = user;
   const [addExpOpen, setAddExpOpen] = useState(false);
   const [addEduOpen, setAddEduOpen] = useState(false);
+  const [addSkillOpen, setAddSkillOpen] = useState(false);
   const topSchool = educations[0];
 
+  const selectedSkillIds = new Set(skills.map((skill) => skill.skillId));
+  const availableSkillsToAdd = allSkills.filter(
+    (skill) => !selectedSkillIds.has(skill.id),
+  );
+
+  const handleCreateSkill = async (data: AddSkillFormData) => {
+    await onCreateUserSkill(data);
+    setAddSkillOpen(false);
+  };
+
   const analyticsItems = [
-    { icon: <Users size={20} />, num: u.connections, label: "Kết nối" },
+    { icon: <Users size={20} />, num: u.connections, label: "Bạn bè" },
     {
       icon: <BarChart2 size={20} />,
       num: u.followers,
@@ -106,7 +128,7 @@ export default function OverviewTab({
               onAdd={() => setAddExpOpen(true)}
               onSeeAll={() => onTabChange("profile")}
             />
-            {experiences.slice(0, 2).map((exp) => (
+            {experiences.map((exp) => (
               <ExperienceItem key={exp.id} exp={exp} compact />
             ))}
             {!experiences.length && (
@@ -138,20 +160,23 @@ export default function OverviewTab({
           <section className="bg-white rounded-2xl p-5 shadow-sm">
             <SectionHead
               title="Kỹ năng"
+              showAdd={u.isOwner}
+              onAdd={() => setAddSkillOpen(true)}
               onSeeAll={() => onTabChange("profile")}
             />
             <div className="flex flex-wrap gap-2">
-              {mockSkills.slice(0, 6).map((sk) => (
+              {!skills.length && (
+                <p className="text-[13px] text-gray-400">Chưa có kỹ năng.</p>
+              )}
+              {skills.slice(0, 6).map((sk) => (
                 <span
                   key={sk.id}
                   className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-[12.5px] font-medium"
                 >
                   {sk.name}
-                  {sk.endorsements > 0 && (
-                    <span className="bg-violet-600 text-white rounded-full px-1.5 text-[10px] font-bold">
-                      {sk.endorsements}
-                    </span>
-                  )}
+                  <span className="bg-violet-600 text-white rounded-full px-1.5 text-[10px] font-bold">
+                    {SKILL_LEVEL_LABELS[sk.level]}
+                  </span>
                 </span>
               ))}
             </div>
@@ -267,6 +292,14 @@ export default function OverviewTab({
         fieldOfStudies={fieldOfStudies}
         isSaving={isCreatingEducation}
         onSave={onCreateEducation}
+      />
+
+      <AddSkillModal
+        open={addSkillOpen}
+        onClose={() => setAddSkillOpen(false)}
+        availableSkills={availableSkillsToAdd}
+        isSaving={isCreatingUserSkill}
+        onSave={handleCreateSkill}
       />
     </div>
   );

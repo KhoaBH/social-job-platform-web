@@ -27,7 +27,7 @@ const recentActivities = [
   },
   {
     icon: <Users size={16} className="text-violet-500" />,
-    text: "Lan Anh đã kết nối với bạn",
+    text: "Lan Anh đã trở thành bạn bè với bạn",
     time: "1 ngày trước",
   },
 ];

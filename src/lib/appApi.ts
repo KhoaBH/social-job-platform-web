@@ -17,6 +17,7 @@ export const appApi = createApi({
     "ProfileUser",
     "ProfileExperience",
     "ProfileEducation",
+    "ProfileSkill",
     "ProfileFollow",
     "ProfileConnection",
     "Posts",

@@ -1,5 +1,51 @@
 export type Tab = "overview" | "profile" | "activity" | "network";
 
+export type ConnectionRelationshipState =
+  | "none"
+  | "pending_sent"
+  | "pending_received"
+  | "friends";
+
+export type SkillLevel = 1 | 2 | 3 | 4 | 5;
+
+export const SKILL_LEVEL_LABELS: Record<SkillLevel, string> = {
+  1: "Mới bắt đầu",
+  2: "Cơ bản",
+  3: "Trung cấp",
+  4: "Nâng cao",
+  5: "Chuyên gia",
+};
+
+export interface ProfileSkillView {
+  id: string;
+  skillId: string;
+  name: string;
+  category: string;
+  level: SkillLevel;
+}
+
+export interface SkillOptionView {
+  id: string;
+  name: string;
+  category: string;
+}
+
+export const normalizeSkillLevel = (value?: number | null): SkillLevel => {
+  if (!value || Number.isNaN(value)) {
+    return 1;
+  }
+
+  if (value <= 1) {
+    return 1;
+  }
+
+  if (value >= 5) {
+    return 5;
+  }
+
+  return value as SkillLevel;
+};
+
 export const initials = (name: string): string =>
   name
     ? name

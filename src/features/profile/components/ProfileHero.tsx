@@ -1,23 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Pencil, ChevronRight } from "lucide-react";
+import { MapPin, Pencil, ChevronRight, UserPlus, Check } from "lucide-react";
 // import { mockProfileUser } from "../data/profileMockData";
-import { ProfileUserView, Tab, initials } from "../types";
+import {
+  ConnectionRelationshipState,
+  ProfileUserView,
+  Tab,
+  initials,
+} from "../types";
 import { ROUTES } from "@/constants/routes";
 
 interface ProfileHeroProps {
   onTabChange: (t: Tab) => void;
   user: ProfileUserView;
   isLoading?: boolean;
+  connectionState?: ConnectionRelationshipState;
+  isSendingConnectionRequest?: boolean;
+  onSendConnectionRequest?: () => void;
 }
 
 export default function ProfileHero({
   onTabChange,
   user,
   isLoading,
+  connectionState = "none",
+  isSendingConnectionRequest = false,
+  onSendConnectionRequest,
 }: ProfileHeroProps) {
   const u = user;
+  const showConnectionAction = !u.isOwner && Boolean(onSendConnectionRequest);
+  const isFriends = connectionState === "friends";
+  const isPendingSent = connectionState === "pending_sent";
+  const isPendingReceived = connectionState === "pending_received";
 
   return (
     <div className="bg-white rounded-2xl overflow-hidden mb-1 shadow-sm">
@@ -97,7 +112,7 @@ export default function ProfileHero({
                 <span className="text-[14px] font-bold text-violet-600">
                   {u.connections}
                 </span>
-                <span className="text-[12px] text-gray-500">kết nối</span>
+                <span className="text-[12px] text-gray-500">bạn bè</span>
               </button>
               <span className="text-gray-300 text-sm">·</span>
               <button className="flex gap-1 items-baseline bg-transparent border-none cursor-pointer p-0">
@@ -134,6 +149,49 @@ export default function ProfileHero({
                 Thêm mục
               </button>
             </>
+          ) : showConnectionAction ? (
+            <button
+              type="button"
+              onClick={onSendConnectionRequest}
+              disabled={
+                isSendingConnectionRequest ||
+                isFriends ||
+                isPendingSent ||
+                isPendingReceived
+              }
+              className={`flex items-center gap-1.5 px-5 py-2 rounded-full text-[13.5px] font-semibold border-[1.5px]
+                         transition-all duration-150 whitespace-nowrap bg-transparent cursor-pointer disabled:cursor-not-allowed disabled:opacity-70
+                         ${
+                           isFriends
+                             ? "border-gray-300 text-gray-500 bg-gray-100"
+                             : isPendingSent
+                               ? "border-gray-300 text-gray-500 bg-gray-100"
+                               : isPendingReceived
+                                 ? "border-amber-500 text-amber-600 bg-amber-50"
+                                 : "border-violet-600 text-violet-600 hover:bg-violet-600 hover:text-white"
+                         }`}
+            >
+              {isSendingConnectionRequest ? (
+                "Đang gửi..."
+              ) : isFriends ? (
+                <>
+                  <Check size={13} />
+                  Đã là bạn bè
+                </>
+              ) : isPendingSent ? (
+                <>
+                  <Check size={13} />
+                  Đã gửi
+                </>
+              ) : isPendingReceived ? (
+                "Đã nhận lời mời"
+              ) : (
+                <>
+                  <UserPlus size={13} />
+                  Thêm bạn
+                </>
+              )}
+            </button>
           ) : (
             <span className="px-3 py-1.5 rounded-full text-[12px] font-semibold bg-gray-100 text-gray-600 whitespace-nowrap">
               Chế độ chỉ xem
