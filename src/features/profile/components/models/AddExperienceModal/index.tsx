@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Building2, X } from "lucide-react";
+import { Building2, X, Trash2 } from "lucide-react";
 import {
   MONTHS,
   YEARS,
@@ -20,6 +20,9 @@ export default function AddExperienceModal({
   companies,
   isSaving = false,
   onSave,
+  onDelete,
+  isDeleting = false,
+  initialData,
 }: AddExperienceModalProps) {
   const initialForm: ExperienceFormData = {
     companyId: undefined,
@@ -38,6 +41,7 @@ export default function AddExperienceModal({
   const [errors, setErrors] = useState<
     Partial<Record<keyof ExperienceFormData, string>>
   >({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -50,11 +54,39 @@ export default function AddExperienceModal({
 
   useEffect(() => {
     if (open) {
-      setForm(initialForm);
+      if (initialData) {
+        
+        const startParts = initialData.startDate.split("-");
+        const startMonth = startParts[1]?.replace(/^0/, "") || "";
+        const startYear = startParts[0] || "";
+
+        let endMonth = "";
+        let endYear = "";
+        if (initialData.endDate) {
+          const endParts = initialData.endDate.split("-");
+          endMonth = endParts[1]?.replace(/^0/, "") || "";
+          endYear = endParts[0] || "";
+        }
+
+        setForm({
+          companyId: undefined,
+          useCustomCompany: true,
+          title: initialData.jobTitle || "",
+          company: initialData.companyName || "",
+          isCurrent: !initialData.endDate,
+          startMonth,
+          startYear,
+          endMonth,
+          endYear,
+          description: initialData.description || "",
+        });
+      } else {
+        setForm(initialForm);
+      }
       setErrors({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, initialData]);
 
   const set = <K extends keyof ExperienceFormData>(
     key: K,
@@ -79,8 +111,19 @@ export default function AddExperienceModal({
     try {
       await onSave?.(form);
       onClose();
-    } catch {
-      // Keep modal open when save fails so user can retry.
+    } catch (error) {
+      console.error("Lỗi khi lưu kinh nghiệm:", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!initialData?.id || isDeleting) return;
+    try {
+      await onDelete?.(initialData.id);
+      setShowDeleteConfirm(false);
+      onClose();
+    } catch (error) {
+      console.error("Lỗi khi xóa kinh nghiệm:", error);
     }
   };
 
@@ -102,7 +145,7 @@ export default function AddExperienceModal({
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             <div>
               <h2 className="text-[17px] font-bold text-gray-900 tracking-tight">
-                Thêm kinh nghiệm
+                {initialData ? "Sửa kinh nghiệm" : "Thêm kinh nghiệm"}
               </h2>
               <p className="text-[12px] text-gray-400 mt-0.5">
                 <span className="text-violet-500">*</span> Thông tin bắt buộc
@@ -282,22 +325,62 @@ export default function AddExperienceModal({
             <div className="h-2" />
           </div>
 
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0 bg-white">
-            <button
-              onClick={onClose}
-              disabled={isSaving}
-              className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
-            >
-              Hủy
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-6 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-violet-600 hover:bg-violet-700 active:scale-[0.97] shadow-sm shadow-violet-200 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSaving ? "Đang lưu..." : "Lưu"}
-            </button>
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3 shrink-0 bg-white">
+            {initialData && onDelete && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isDeleting || isSaving}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-full text-[13.5px] font-semibold text-red-600 border border-red-200 hover:bg-red-50 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <Trash2 size={16} />
+                Xóa
+              </button>
+            )}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onClose}
+                disabled={isSaving || isDeleting}
+                className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving || isDeleting}
+                className="px-6 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-violet-600 hover:bg-violet-700 active:scale-[0.97] shadow-sm shadow-violet-200 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isSaving ? "Đang lưu..." : initialData ? "Cập nhật" : "Thêm"}
+              </button>
+            </div>
           </div>
+
+          {showDeleteConfirm && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+              <div className="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm mx-4 animate-fadeIn">
+                <h3 className="text-[16px] font-bold text-gray-900 mb-2">Xác nhận xóa?</h3>
+                <p className="text-[13.5px] text-gray-600 mb-6">
+                  Bạn chắc chắn muốn xóa kinh nghiệm này? Hành động này không thể hoàn tác.
+                </p>
+                <div className="flex items-center gap-3 justify-end">
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    disabled={isDeleting}
+                    className="px-4 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                    className="px-4 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-red-600 hover:bg-red-700 active:scale-[0.97] transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isDeleting ? "Đang xóa..." : "Xóa"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>,

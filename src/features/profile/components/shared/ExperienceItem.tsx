@@ -5,11 +5,15 @@ import { ProfileExperienceView } from "../../types";
 interface ExperienceItemProps {
   exp: ProfileExperienceView;
   compact: boolean;
+  onEdit?: (exp: ProfileExperienceView) => void;
 }
 
-export default function ExperienceItem({ exp, compact }: ExperienceItemProps) {
+export default function ExperienceItem({ exp, compact, onEdit }: ExperienceItemProps) {
   return (
-    <div className="flex gap-3.5 py-3.5 border-b border-gray-100 last:border-b-0 last:pb-0">
+    <div 
+      className="flex gap-3.5 py-3.5 border-b border-gray-100 last:border-b-0 last:pb-0 cursor-pointer hover:bg-gray-50 px-2 -mx-2 rounded transition-colors"
+      onClick={() => onEdit?.(exp)}
+    >
       {/* Logo */}
       <div
         className="w-11 h-11 rounded-xl shrink-0 flex items-center justify-center text-[15px] font-extrabold text-white"

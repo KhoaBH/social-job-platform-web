@@ -1,3 +1,118 @@
+export interface BackendUser {
+  id: string;
+  email: string;
+  username: string;
+  fullName?: string | null;
+  avatarUrl?: string | null;
+  profileText?: string | null;
+  headline?: string | null;
+  summary?: string | null;
+  location?: string | null;
+}
+
+export interface BackendCompany {
+  id: string;
+  name?: string | null;
+}
+
+export interface BackendWorkExperience {
+  id: string;
+  company?: BackendCompany | null;
+  companyName?: string | null;
+  jobTitle?: string | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  description?: string | null;
+}
+
+export interface BackendFieldOfStudy {
+  id: string;
+  name?: string | null;
+}
+
+export interface BackendSchool {
+  id: string;
+  name?: string | null;
+}
+
+export interface BackendEducation {
+  id: string;
+  school?: BackendSchool | null;
+  schoolName?: string | null;
+  degree?: string | null;
+  fieldOfStudy?: BackendFieldOfStudy | null;
+  startYear?: number | null;
+  endYear?: number | null;
+}
+
+export interface BackendFollow {
+  id: string;
+  follower?: { id: string } | null;
+  followee?: { id: string } | null;
+}
+
+export interface BackendConnectionUser {
+  id: string;
+}
+
+export interface BackendConnection {
+  id: string;
+  requester?: BackendConnectionUser | null;
+  addressee?: BackendConnectionUser | null;
+  status: "PENDING" | "ACCEPTED" | "REJECTED" | "BLOCKED" | string;
+}
+
+export interface BackendSkillCategory {
+  id: string;
+  name?: string | null;
+}
+
+export interface BackendSkill {
+  id: string;
+  name?: string | null;
+  category?: BackendSkillCategory | null;
+}
+
+export interface BackendUserSkill {
+  id: string;
+  level?: number | null;
+  skill?: BackendSkill | null;
+}
+
+// ===== Payload =====
+export interface CreateWorkExperiencePayload {
+  companyId?: string;
+  companyName?: string;
+  jobTitle: string;
+  startDate: string;
+  endDate?: string;
+  description?: string;
+}
+
+export interface UpdateWorkExperiencePayload {
+  companyId?: string;
+  companyName?: string;
+  jobTitle: string;
+  startDate: string;
+  endDate?: string;
+  description?: string;
+}
+
+export interface CreateUserSkillPayload {
+  skillId: string;
+  level: number;
+}
+
+export interface CreateEducationPayload {
+  schoolId?: string;
+  schoolName?: string;
+  degree: string;
+  fieldOfStudyId: string;
+  startYear?: number;
+  endYear?: number;
+}
+
+// ===== View Model =====
 export type Tab = "overview" | "profile" | "activity" | "network";
 
 export type ConnectionRelationshipState =
@@ -7,14 +122,6 @@ export type ConnectionRelationshipState =
   | "friends";
 
 export type SkillLevel = 1 | 2 | 3 | 4 | 5;
-
-export const SKILL_LEVEL_LABELS: Record<SkillLevel, string> = {
-  1: "Mới bắt đầu",
-  2: "Cơ bản",
-  3: "Trung cấp",
-  4: "Nâng cao",
-  5: "Chuyên gia",
-};
 
 export interface ProfileSkillView {
   id: string;
@@ -29,31 +136,6 @@ export interface SkillOptionView {
   name: string;
   category: string;
 }
-
-export const normalizeSkillLevel = (value?: number | null): SkillLevel => {
-  if (!value || Number.isNaN(value)) {
-    return 1;
-  }
-
-  if (value <= 1) {
-    return 1;
-  }
-
-  if (value >= 5) {
-    return 5;
-  }
-
-  return value as SkillLevel;
-};
-
-export const initials = (name: string): string =>
-  name
-    ? name
-        .split(" ")
-        .map((w) => w[0])
-        .slice(-2)
-        .join("")
-    : "U";
 
 export interface ProfileUserView {
   id: string;
@@ -97,28 +179,11 @@ export interface ProfileEducationView {
   activities: string;
 }
 
-export const toMonthYear = (dateInput?: string | null): string => {
-  if (!dateInput) {
-    return "";
-  }
-
-  const date = new Date(dateInput);
-  if (Number.isNaN(date.getTime())) {
-    return "";
-  }
-
-  return `${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
-};
-
-export const randomSoftColorFromString = (seed: string): string => {
-  const palette = [
-    "#FF6B35",
-    "#0EA5E9",
-    "#10B981",
-    "#8B5CF6",
-    "#F59E0B",
-    "#EF4444",
-  ];
-  const value = seed.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-  return palette[value % palette.length];
+// ===== Constants =====
+export const SKILL_LEVEL_LABELS: Record<SkillLevel, string> = {
+  1: "Mới bắt đầu",
+  2: "Cơ bản",
+  3: "Trung cấp",
+  4: "Nâng cao",
+  5: "Chuyên gia",
 };

@@ -47,6 +47,7 @@ interface OverviewTabProps {
   isCreatingEducation?: boolean;
   onCreateUserSkill: (data: AddSkillFormData) => Promise<void>;
   isCreatingUserSkill?: boolean;
+  onEditExperience?: (exp: ProfileExperienceView) => void;
 }
 
 export default function OverviewTab({
@@ -65,6 +66,7 @@ export default function OverviewTab({
   isCreatingEducation,
   onCreateUserSkill,
   isCreatingUserSkill,
+  onEditExperience,
 }: OverviewTabProps) {
   const u = user;
   const [addExpOpen, setAddExpOpen] = useState(false);
@@ -129,7 +131,12 @@ export default function OverviewTab({
               onSeeAll={() => onTabChange("profile")}
             />
             {experiences.map((exp) => (
-              <ExperienceItem key={exp.id} exp={exp} compact />
+              <ExperienceItem 
+                key={exp.id} 
+                exp={exp} 
+                compact 
+                onEdit={u.isOwner ? onEditExperience : undefined}
+              />
             ))}
             {!experiences.length && (
               <p className="text-[13px] text-gray-400">

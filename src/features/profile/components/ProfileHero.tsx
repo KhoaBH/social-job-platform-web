@@ -7,9 +7,9 @@ import {
   ConnectionRelationshipState,
   ProfileUserView,
   Tab,
-  initials,
 } from "../types";
 import { ROUTES } from "@/constants/routes";
+import { initials } from "../profile.utils";
 
 interface ProfileHeroProps {
   onTabChange: (t: Tab) => void;

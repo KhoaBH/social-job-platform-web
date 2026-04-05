@@ -6,10 +6,11 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useSendConnectionRequestMutation } from "@/features/dashboard/dashboardApi";
 import {
-  CreateUserSkillPayload,
   useCreateUserSkillMutation,
   useCreateEducationMutation,
   useCreateWorkExperienceMutation,
+  useUpdateWorkExperienceMutation,
+  useDeleteWorkExperienceMutation,
   useGetCompaniesQuery,
   useGetEducationsByUserQuery,
   useGetFieldOfStudiesQuery,
@@ -22,6 +23,7 @@ import {
   useGetWorkExperiencesByUserQuery,
 } from "../profileApi";
 import {
+  CreateUserSkillPayload,
   ConnectionRelationshipState,
   ProfileEducationView,
   ProfileExperienceView,
@@ -29,12 +31,11 @@ import {
   ProfileUserView,
   SkillOptionView,
   Tab,
-  normalizeSkillLevel,
-  randomSoftColorFromString,
-  toMonthYear,
 } from "../types";
+import { normalizeSkillLevel, randomSoftColorFromString, toMonthYear } from "../profile.utils";
 import { ExperienceFormData } from "./models/AddExperienceModal/types";
 import { EducationFormData } from "./models/AddEducationModal/types";
+import AddExperienceModal from "./models/AddExperienceModal";
 import ProfileHero from "./ProfileHero";
 import ProfileTabBar from "./ProfileTabBar";
 import OverviewTab from "./tabs/OverviewTab";
@@ -47,6 +48,8 @@ export default function ProfileLayout() {
   const [locallySentConnectionIds, setLocallySentConnectionIds] = useState<
     string[]
   >([]);
+  const [addExpOpen, setAddExpOpen] = useState(false);
+  const [editingExperience, setEditingExperience] = useState<ProfileExperienceView | null>(null);
   const params = useParams<{ userId: string }>();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const routeUserId = typeof params.userId === "string" ? params.userId : "";
@@ -91,6 +94,10 @@ export default function ProfileLayout() {
 
   const [createWorkExperience, { isLoading: isCreatingExperience }] =
     useCreateWorkExperienceMutation();
+  const [updateWorkExperience, { isLoading: isUpdatingExperience }] =
+    useUpdateWorkExperienceMutation();
+  const [deleteWorkExperience, { isLoading: isDeletingExperience }] =
+    useDeleteWorkExperienceMutation();
   const [createEducation, { isLoading: isCreatingEducation }] =
     useCreateEducationMutation();
   const [createUserSkill, { isLoading: isCreatingUserSkill }] =
@@ -272,16 +279,33 @@ export default function ProfileLayout() {
       ? `${form.endYear}-${String(Number(form.endMonth)).padStart(2, "0")}-01`
       : undefined;
 
-    await createWorkExperience({
+    const payload = {
       companyId: form.companyId,
       companyName: form.company,
       jobTitle: form.title,
       startDate,
       endDate,
       description: form.description,
-    }).unwrap();
+    };
+
+    // Nếu đang edit, gọi update API, nếu không thì create
+    if (editingExperience?.id) {
+      await updateWorkExperience({
+        id: editingExperience.id,
+        body: payload,
+      }).unwrap();
+    } else {
+      await createWorkExperience(payload).unwrap();
+    }
 
     await refetchExperiences();
+    setAddExpOpen(false);
+    setEditingExperience(null);
+  };
+
+  const handleEditExperience = (exp: ProfileExperienceView) => {
+    setEditingExperience(exp);
+    setAddExpOpen(true);
   };
 
   const handleCreateEducation = async (form: EducationFormData) => {
@@ -308,6 +332,15 @@ export default function ProfileLayout() {
 
     await createUserSkill(payload).unwrap();
     await refetchUserSkills();
+  };
+
+  const handleDeleteExperience = async (id: string) => {
+    if (!isOwner) {
+      return;
+    }
+
+    await deleteWorkExperience(id).unwrap();
+    await refetchExperiences();
   };
 
   return (
@@ -353,6 +386,7 @@ export default function ProfileLayout() {
               isCreatingEducation={isCreatingEducation}
               onCreateUserSkill={handleCreateUserSkill}
               isCreatingUserSkill={isCreatingUserSkill}
+              onEditExperience={handleEditExperience}
             />
           )}
           {activeTab === "profile" && (
@@ -371,12 +405,38 @@ export default function ProfileLayout() {
               isCreatingEducation={isCreatingEducation}
               onCreateUserSkill={handleCreateUserSkill}
               isCreatingUserSkill={isCreatingUserSkill}
+              onEditExperience={handleEditExperience}
             />
           )}
           {activeTab === "activity" && <ActivityTab />}
           {activeTab === "network" && <NetworkTab />}
         </div>
       </div>
+
+      <AddExperienceModal
+        open={addExpOpen}
+        onClose={() => {
+          setAddExpOpen(false);
+          setEditingExperience(null);
+        }}
+        companies={companies}
+        isSaving={isCreatingExperience || isUpdatingExperience}
+        isDeleting={isDeletingExperience}
+        onSave={handleCreateExperience}
+        onDelete={handleDeleteExperience}
+        initialData={
+          editingExperience
+            ? {
+                id: editingExperience.id,
+                startDate: editingExperience.startDate,
+                endDate: editingExperience.endDate,
+                jobTitle: editingExperience.title,
+                companyName: editingExperience.company,
+                description: editingExperience.description,
+              }
+            : undefined
+        }
+      />
     </>
   );
 }

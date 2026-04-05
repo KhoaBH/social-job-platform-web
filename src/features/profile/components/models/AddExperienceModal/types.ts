@@ -18,4 +18,14 @@ export interface AddExperienceModalProps {
   companies: Array<{ id: string; name?: string | null }>;
   isSaving?: boolean;
   onSave?: (data: ExperienceFormData) => void | Promise<void>;
+  onDelete?: (id: string) => void | Promise<void>;
+  isDeleting?: boolean;
+  initialData?: {
+    id?: string;
+    startDate: string;
+    endDate?: string;
+    jobTitle?: string;
+    companyName?: string;
+    description?: string;
+  };
 }

@@ -12,8 +12,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { mockProfileUser, mockPosts } from "../../data/profileMockData";
-import { initials } from "../../types";
-
+import { initials } from "../../profile.utils";
 const recentActivities = [
   {
     icon: <Heart size={16} className="text-rose-500" />,

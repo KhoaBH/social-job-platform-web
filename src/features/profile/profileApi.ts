@@ -1,110 +1,23 @@
 import { appApi } from "@/lib/appApi";
-
-export interface BackendUser {
-  id: string;
-  email: string;
-  username: string;
-  fullName?: string | null;
-  avatarUrl?: string | null;
-  profileText?: string | null;
-  headline?: string | null;
-  summary?: string | null;
-  location?: string | null;
-}
-
-export interface BackendCompany {
-  id: string;
-  name?: string | null;
-}
-
-export interface BackendWorkExperience {
-  id: string;
-  company?: BackendCompany | null;
-  companyName?: string | null;
-  jobTitle?: string | null;
-  startDate?: string | null;
-  endDate?: string | null;
-  description?: string | null;
-}
-
-export interface BackendFieldOfStudy {
-  id: string;
-  name?: string | null;
-}
-
-export interface BackendSchool {
-  id: string;
-  name?: string | null;
-}
-
-export interface BackendEducation {
-  id: string;
-  school?: BackendSchool | null;
-  schoolName?: string | null;
-  degree?: string | null;
-  fieldOfStudy?: BackendFieldOfStudy | null;
-  startYear?: number | null;
-  endYear?: number | null;
-}
-
-export interface CreateWorkExperiencePayload {
-  companyId?: string;
-  companyName?: string;
-  jobTitle: string;
-  startDate: string;
-  endDate?: string;
-  description?: string;
-}
-
-export interface BackendFollow {
-  id: string;
-  follower?: { id: string } | null;
-  followee?: { id: string } | null;
-}
-
-export interface BackendConnectionUser {
-  id: string;
-}
-
-export interface BackendConnection {
-  id: string;
-  requester?: BackendConnectionUser | null;
-  addressee?: BackendConnectionUser | null;
-  status: "PENDING" | "ACCEPTED" | "REJECTED" | "BLOCKED" | string;
-}
-
-export interface BackendSkillCategory {
-  id: string;
-  name?: string | null;
-}
-
-export interface BackendSkill {
-  id: string;
-  name?: string | null;
-  category?: BackendSkillCategory | null;
-}
-
-export interface BackendUserSkill {
-  id: string;
-  level?: number | null;
-  skill?: BackendSkill | null;
-}
-
-export interface CreateUserSkillPayload {
-  skillId: string;
-  level: number;
-}
-
-export interface CreateEducationPayload {
-  schoolId?: string;
-  schoolName?: string;
-  degree: string;
-  fieldOfStudyId: string;
-  startYear?: number;
-  endYear?: number;
-}
+import {
+  BackendUser,
+  BackendWorkExperience,
+  BackendEducation,
+  BackendCompany,
+  BackendSchool,
+  BackendFieldOfStudy,
+  BackendSkill,
+  BackendUserSkill,
+  BackendFollow,
+  BackendConnection,
+  CreateWorkExperiencePayload,
+  UpdateWorkExperiencePayload,
+  CreateEducationPayload,
+  CreateUserSkillPayload,
+} from "../profile/types";
 
 export const profileApi = appApi.injectEndpoints({
+  overrideExisting: true,
   endpoints: (builder) => ({
     getUserById: builder.query<BackendUser, string>({
       query: (userId) => `/users/${userId}`,
@@ -131,6 +44,7 @@ export const profileApi = appApi.injectEndpoints({
         { type: "ProfileExperience", id: userId },
       ],
     }),
+
     createWorkExperience: builder.mutation<
       BackendWorkExperience,
       CreateWorkExperiencePayload
@@ -142,6 +56,26 @@ export const profileApi = appApi.injectEndpoints({
       }),
       invalidatesTags: [{ type: "ProfileExperience", id: "LIST" }],
     }),
+    deleteWorkExperience: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/work-experiences/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "ProfileExperience", id: "LIST" }],
+    }),
+    updateWorkExperience: builder.mutation<
+      BackendWorkExperience,
+      { id: string; body: UpdateWorkExperiencePayload }
+    >({
+      query: ({ id, body }) => ({
+        url: `/work-experiences/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "ProfileExperience", id: "LIST" }],
+    }),
+    
+
     getEducationsByUser: builder.query<BackendEducation[], string>({
       query: (userId) => `/educations/user/${userId}`,
       providesTags: (_result, _error, userId) => [
@@ -184,9 +118,7 @@ export const profileApi = appApi.injectEndpoints({
           method: "POST",
           body,
         }),
-        invalidatesTags: (_result, _error, _arg) => [
-          { type: "ProfileSkill", id: "SKILL_LIST" },
-        ],
+        invalidatesTags: [{ type: "ProfileSkill", id: "SKILL_LIST" }],
       },
     ),
     getMyFollowing: builder.query<BackendFollow[], void>({
@@ -209,6 +141,8 @@ export const {
   useUpdateUserByIdMutation,
   useGetWorkExperiencesByUserQuery,
   useCreateWorkExperienceMutation,
+  useUpdateWorkExperienceMutation,
+  useDeleteWorkExperienceMutation,
   useGetEducationsByUserQuery,
   useCreateEducationMutation,
   useGetCompaniesQuery,
