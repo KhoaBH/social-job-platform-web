@@ -13,6 +13,7 @@ import {
   CreateWorkExperiencePayload,
   UpdateWorkExperiencePayload,
   CreateEducationPayload,
+  UpdateEducationPayload,
   CreateUserSkillPayload,
 } from "../profile/types";
 
@@ -92,6 +93,24 @@ export const profileApi = appApi.injectEndpoints({
         invalidatesTags: [{ type: "ProfileEducation", id: "LIST" }],
       },
     ),
+    updateEducation: builder.mutation<
+      BackendEducation,
+      { id: string; body: UpdateEducationPayload }
+    >({
+      query: ({ id, body }) => ({
+        url: `/educations/${id}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: [{ type: "ProfileEducation", id: "LIST" }],
+    }),
+    deleteEducation: builder.mutation<void, string>({
+      query: (id) => ({
+        url: `/educations/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: [{ type: "ProfileEducation", id: "LIST" }],
+    }),
     getCompanies: builder.query<BackendCompany[], void>({
       query: () => "/companies",
     }),
@@ -145,6 +164,8 @@ export const {
   useDeleteWorkExperienceMutation,
   useGetEducationsByUserQuery,
   useCreateEducationMutation,
+  useUpdateEducationMutation,
+  useDeleteEducationMutation,
   useGetCompaniesQuery,
   useGetSchoolsQuery,
   useGetFieldOfStudiesQuery,

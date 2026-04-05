@@ -112,6 +112,15 @@ export interface CreateEducationPayload {
   endYear?: number;
 }
 
+export interface UpdateEducationPayload {
+  schoolId?: string;
+  schoolName?: string;
+  degree: string;
+  fieldOfStudyId: string;
+  startYear?: number;
+  endYear?: number;
+}
+
 // ===== View Model =====
 export type Tab = "overview" | "profile" | "activity" | "network";
 

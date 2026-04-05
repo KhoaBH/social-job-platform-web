@@ -11,6 +11,8 @@ import {
   useCreateWorkExperienceMutation,
   useUpdateWorkExperienceMutation,
   useDeleteWorkExperienceMutation,
+  useUpdateEducationMutation,
+  useDeleteEducationMutation,
   useGetCompaniesQuery,
   useGetEducationsByUserQuery,
   useGetFieldOfStudiesQuery,
@@ -36,6 +38,7 @@ import { normalizeSkillLevel, randomSoftColorFromString, toMonthYear } from "../
 import { ExperienceFormData } from "./models/AddExperienceModal/types";
 import { EducationFormData } from "./models/AddEducationModal/types";
 import AddExperienceModal from "./models/AddExperienceModal";
+import AddEducationModal from "./models/AddEducationModal";
 import ProfileHero from "./ProfileHero";
 import ProfileTabBar from "./ProfileTabBar";
 import OverviewTab from "./tabs/OverviewTab";
@@ -50,6 +53,8 @@ export default function ProfileLayout() {
   >([]);
   const [addExpOpen, setAddExpOpen] = useState(false);
   const [editingExperience, setEditingExperience] = useState<ProfileExperienceView | null>(null);
+  const [addEduOpen, setAddEduOpen] = useState(false);
+  const [editingEducation, setEditingEducation] = useState<ProfileEducationView | null>(null);
   const params = useParams<{ userId: string }>();
   const authUser = useSelector((state: RootState) => state.auth.user);
   const routeUserId = typeof params.userId === "string" ? params.userId : "";
@@ -100,6 +105,10 @@ export default function ProfileLayout() {
     useDeleteWorkExperienceMutation();
   const [createEducation, { isLoading: isCreatingEducation }] =
     useCreateEducationMutation();
+  const [updateEducation, { isLoading: isUpdatingEducation }] =
+    useUpdateEducationMutation();
+  const [deleteEducation, { isLoading: isDeletingEducation }] =
+    useDeleteEducationMutation();
   const [createUserSkill, { isLoading: isCreatingUserSkill }] =
     useCreateUserSkillMutation();
 
@@ -313,15 +322,41 @@ export default function ProfileLayout() {
       return;
     }
 
-    await createEducation({
+    const payload = {
       schoolId: form.schoolId,
       schoolName: form.schoolName,
       degree: form.degree,
       fieldOfStudyId: form.fieldOfStudyId,
       startYear: form.startYear ? Number(form.startYear) : undefined,
       endYear: form.endYear ? Number(form.endYear) : undefined,
-    }).unwrap();
+    };
 
+    // Nếu đang edit, gọi update API, nếu không thì create
+    if (editingEducation?.id) {
+      await updateEducation({
+        id: editingEducation.id,
+        body: payload,
+      }).unwrap();
+    } else {
+      await createEducation(payload).unwrap();
+    }
+
+    await refetchEducations();
+    setAddEduOpen(false);
+    setEditingEducation(null);
+  };
+
+  const handleEditEducation = (edu: ProfileEducationView) => {
+    setEditingEducation(edu);
+    setAddEduOpen(true);
+  };
+
+  const handleDeleteEducation = async (id: string) => {
+    if (!isOwner) {
+      return;
+    }
+
+    await deleteEducation(id).unwrap();
     await refetchEducations();
   };
 
@@ -387,6 +422,7 @@ export default function ProfileLayout() {
               onCreateUserSkill={handleCreateUserSkill}
               isCreatingUserSkill={isCreatingUserSkill}
               onEditExperience={handleEditExperience}
+              onEditEducation={handleEditEducation}
             />
           )}
           {activeTab === "profile" && (
@@ -406,6 +442,7 @@ export default function ProfileLayout() {
               onCreateUserSkill={handleCreateUserSkill}
               isCreatingUserSkill={isCreatingUserSkill}
               onEditExperience={handleEditExperience}
+              onEditEducation={handleEditEducation}
             />
           )}
           {activeTab === "activity" && <ActivityTab />}
@@ -433,6 +470,32 @@ export default function ProfileLayout() {
                 jobTitle: editingExperience.title,
                 companyName: editingExperience.company,
                 description: editingExperience.description,
+              }
+            : undefined
+        }
+      />
+
+      <AddEducationModal
+        open={addEduOpen}
+        onClose={() => {
+          setAddEduOpen(false);
+          setEditingEducation(null);
+        }}
+        schools={schools}
+        fieldOfStudies={fieldOfStudies}
+        isSaving={isCreatingEducation || isUpdatingEducation}
+        isDeleting={isDeletingEducation}
+        onSave={handleCreateEducation}
+        onDelete={handleDeleteEducation}
+        initialData={
+          editingEducation
+            ? {
+                id: editingEducation.id,
+                schoolName: editingEducation.school,
+                degree: editingEducation.degree,
+                fieldOfStudyId: educations.find((e) => e.id === editingEducation.id)?.fieldOfStudy?.id || "",
+                startYear: parseInt(editingEducation.startYear, 10),
+                endYear: editingEducation.endYear ? parseInt(editingEducation.endYear, 10) : undefined,
               }
             : undefined
         }

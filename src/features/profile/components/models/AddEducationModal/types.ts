@@ -15,4 +15,15 @@ export interface AddEducationModalProps {
   fieldOfStudies: Array<{ id: string; name?: string | null }>;
   isSaving?: boolean;
   onSave?: (data: EducationFormData) => void | Promise<void>;
+  onDelete?: (id: string) => void | Promise<void>;
+  isDeleting?: boolean;
+  initialData?: {
+    id?: string;
+    schoolName?: string;
+    schoolId?: string;
+    degree?: string;
+    fieldOfStudyId?: string;
+    startYear?: number;
+    endYear?: number;
+  };
 }

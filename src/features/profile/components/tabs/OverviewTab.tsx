@@ -48,6 +48,7 @@ interface OverviewTabProps {
   onCreateUserSkill: (data: AddSkillFormData) => Promise<void>;
   isCreatingUserSkill?: boolean;
   onEditExperience?: (exp: ProfileExperienceView) => void;
+  onEditEducation?: (edu: ProfileEducationView) => void;
 }
 
 export default function OverviewTab({
@@ -67,6 +68,7 @@ export default function OverviewTab({
   onCreateUserSkill,
   isCreatingUserSkill,
   onEditExperience,
+  onEditEducation,
 }: OverviewTabProps) {
   const u = user;
   const [addExpOpen, setAddExpOpen] = useState(false);
@@ -154,7 +156,12 @@ export default function OverviewTab({
               onSeeAll={() => onTabChange("profile")}
             />
             {educations.map((edu) => (
-              <EducationItem key={edu.id} edu={edu} compact />
+              <EducationItem 
+                key={edu.id} 
+                edu={edu} 
+                compact
+                onEdit={u.isOwner ? onEditEducation : undefined}
+              />
             ))}
             {!educations.length && (
               <p className="text-[13px] text-gray-400">

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { GraduationCap, X } from "lucide-react";
+import { GraduationCap, X, Trash2 } from "lucide-react";
 import {
   FieldLabel,
   SelectInput,
@@ -27,6 +27,9 @@ export default function AddEducationModal({
   fieldOfStudies,
   isSaving = false,
   onSave,
+  onDelete,
+  isDeleting = false,
+  initialData,
 }: AddEducationModalProps) {
   const initialForm: EducationFormData = {
     schoolId: undefined,
@@ -42,6 +45,7 @@ export default function AddEducationModal({
   const [errors, setErrors] = useState<
     Partial<Record<keyof EducationFormData, string>>
   >({});
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,11 +58,23 @@ export default function AddEducationModal({
 
   useEffect(() => {
     if (open) {
-      setForm(initialForm);
+      if (initialData) {
+        setForm({
+          schoolId: initialData.schoolId,
+          schoolName: initialData.schoolName || "",
+          useCustomSchool: !initialData.schoolId,
+          degree: initialData.degree || "",
+          fieldOfStudyId: initialData.fieldOfStudyId || "",
+          startYear: String(initialData.startYear || ""),
+          endYear: String(initialData.endYear || ""),
+        });
+      } else {
+        setForm(initialForm);
+      }
       setErrors({});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, initialData]);
 
   const set = <K extends keyof EducationFormData>(
     key: K,
@@ -100,6 +116,17 @@ export default function AddEducationModal({
     }
   };
 
+  const handleDelete = async () => {
+    if (!initialData?.id || isDeleting) return;
+    try {
+      await onDelete?.(initialData.id);
+      setShowDeleteConfirm(false);
+      onClose();
+    } catch (error) {
+      console.error("Lỗi khi xóa học vấn:", error);
+    }
+  };
+
   if (!open) {
     return null;
   }
@@ -120,7 +147,7 @@ export default function AddEducationModal({
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             <div>
               <h2 className="text-[17px] font-bold text-gray-900 tracking-tight">
-                Thêm học vấn
+                {initialData ? "Sửa học vấn" : "Thêm học vấn"}
               </h2>
               <p className="text-[12px] text-gray-400 mt-0.5">
                 <span className="text-violet-500">*</span> Thông tin bắt buộc
@@ -253,21 +280,63 @@ export default function AddEducationModal({
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0 bg-white">
-            <button
-              onClick={onClose}
-              disabled={isSaving}
-              className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
-            >
-              Hủy
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-6 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-violet-600 hover:bg-violet-700 active:scale-[0.97] shadow-sm shadow-violet-200 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSaving ? "Đang lưu..." : "Lưu"}
-            </button>
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3 shrink-0 bg-white">
+            <div>
+              {initialData && (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  disabled={isDeleting}
+                  className="px-4 py-2.5 rounded-full text-[13.5px] font-semibold text-red-600 hover:bg-red-50 transition-all flex items-center gap-2"
+                >
+                  <Trash2 size={16} />
+                  Xóa
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={onClose}
+                disabled={isSaving}
+                className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-6 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-violet-600 hover:bg-violet-700 active:scale-[0.97] shadow-sm shadow-violet-200 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isSaving ? "Đang lưu..." : "Lưu"}
+              </button>
+            </div>
+
+            {showDeleteConfirm && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
+                <div className="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm mx-4">
+                  <h3 className="text-[16px] font-bold text-gray-900">Xóa học vấn</h3>
+                  <p className="text-[14px] text-gray-600 mt-2">
+                    Bạn có chắc muốn xóa bản ghi học vấn này không? Hành động này không thể hoàn tác.
+                  </p>
+                  <div className="flex items-center gap-3 mt-6 justify-end">
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      disabled={isDeleting}
+                      className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-red-600 hover:bg-red-700 transition-all disabled:opacity-60"
+                    >
+                      {isDeleting ? "Đang xóa..." : "Xóa"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

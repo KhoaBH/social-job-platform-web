@@ -38,6 +38,7 @@ interface ProfileSkillsTabProps {
   onCreateUserSkill: (data: AddSkillFormData) => Promise<void>;
   isCreatingUserSkill?: boolean;
   onEditExperience?: (exp: ProfileExperienceView) => void;
+  onEditEducation?: (edu: ProfileEducationView) => void;
 }
 
 export default function ProfileSkillsTab({
@@ -56,6 +57,7 @@ export default function ProfileSkillsTab({
   onCreateUserSkill,
   isCreatingUserSkill,
   onEditExperience,
+  onEditEducation,
 }: ProfileSkillsTabProps) {
   const u = user;
   const [activeSkillCat, setActiveSkillCat] = useState(DEFAULT_CATEGORY);
@@ -128,7 +130,12 @@ export default function ProfileSkillsTab({
               showEdit={u.isOwner}
             />
             {educations.map((edu) => (
-              <EducationItem key={edu.id} edu={edu} compact={false} />
+              <EducationItem 
+                key={edu.id} 
+                edu={edu} 
+                compact={false}
+                onEdit={u.isOwner ? onEditEducation : undefined}
+              />
             ))}
             {!educations.length && (
               <p className="text-[13px] text-gray-400">
