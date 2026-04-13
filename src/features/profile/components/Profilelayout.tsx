@@ -13,6 +13,8 @@ import {
   useDeleteWorkExperienceMutation,
   useUpdateEducationMutation,
   useDeleteEducationMutation,
+  useUpdateUserSkillMutation,
+  useDeleteUserSkillMutation,
   useGetCompaniesQuery,
   useGetEducationsByUserQuery,
   useGetFieldOfStudiesQuery,
@@ -111,6 +113,10 @@ export default function ProfileLayout() {
     useDeleteEducationMutation();
   const [createUserSkill, { isLoading: isCreatingUserSkill }] =
     useCreateUserSkillMutation();
+  const [updateUserSkill, { isLoading: isUpdatingUserSkill }] =
+    useUpdateUserSkillMutation();
+  const [deleteUserSkill, { isLoading: isDeletingUserSkill }] =
+    useDeleteUserSkillMutation();
 
   const currentConnectionState: ConnectionRelationshipState = useMemo(() => {
     if (!authUser?.id || !targetUserId || authUser.id === targetUserId) {
@@ -369,6 +375,31 @@ export default function ProfileLayout() {
     await refetchUserSkills();
   };
 
+  const handleUpdateUserSkill = async (skillId: string, payload: CreateUserSkillPayload) => {
+    if (!isOwner) {
+      return;
+    }
+
+    await updateUserSkill({
+      userId: targetUserId,
+      skillId,
+      body: payload,
+    }).unwrap();
+    await refetchUserSkills();
+  };
+
+  const handleDeleteUserSkill = async (skillId: string) => {
+    if (!isOwner) {
+      return;
+    }
+
+    await deleteUserSkill({
+      userId: targetUserId,
+      skillId,
+    }).unwrap();
+    await refetchUserSkills();
+  };
+
   const handleDeleteExperience = async (id: string) => {
     if (!isOwner) {
       return;
@@ -443,6 +474,10 @@ export default function ProfileLayout() {
               isCreatingUserSkill={isCreatingUserSkill}
               onEditExperience={handleEditExperience}
               onEditEducation={handleEditEducation}
+              onUpdateUserSkill={handleUpdateUserSkill}
+              isUpdatingUserSkill={isUpdatingUserSkill}
+              onDeleteUserSkill={handleDeleteUserSkill}
+              isDeletingUserSkill={isDeletingUserSkill}
             />
           )}
           {activeTab === "activity" && <ActivityTab />}

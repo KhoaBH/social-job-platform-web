@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { BadgeCheck, X } from "lucide-react";
+import { BadgeCheck, X, Trash2 } from "lucide-react";
 import { SelectInput, FieldLabel } from "../AddExperienceModal/components";
 import { SKILL_LEVEL_LABELS, SkillLevel } from "@/features/profile/types";
 import { AddSkillFormData, AddSkillModalProps } from "./types";
@@ -17,6 +17,9 @@ export default function AddSkillModal({
   availableSkills,
   isSaving = false,
   onSave,
+  onDelete,
+  isDeleting = false,
+  initialData,
 }: AddSkillModalProps) {
   const initialForm: AddSkillFormData = {
     skillId: "",
@@ -25,6 +28,7 @@ export default function AddSkillModal({
 
   const [form, setForm] = useState<AddSkillFormData>(initialForm);
   const [error, setError] = useState<string>("");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,14 +43,20 @@ export default function AddSkillModal({
   }, [onClose]);
 
   useEffect(() => {
-    if (!open) {
-      return;
+    if (open) {
+      if (initialData) {
+        setForm({
+          skillId: initialData.skillId,
+          level: initialData.level,
+        });
+      } else {
+        setForm(initialForm);
+      }
+      setError("");
+      setShowDeleteConfirm(false);
     }
-
-    setForm(initialForm);
-    setError("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, initialData]);
 
   const skillOptions = useMemo(
     () =>
@@ -78,6 +88,17 @@ export default function AddSkillModal({
     }
   };
 
+  const handleDelete = async () => {
+    if (!initialData?.id || isDeleting) return;
+    try {
+      await onDelete?.(initialData.id);
+      setShowDeleteConfirm(false);
+      onClose();
+    } catch {
+      setError("Không thể xóa kỹ năng. Vui lòng thử lại.");
+    }
+  };
+
   if (!open) {
     return null;
   }
@@ -95,7 +116,7 @@ export default function AddSkillModal({
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
             <div>
               <h2 className="text-[17px] font-bold text-gray-900 tracking-tight">
-                Thêm kỹ năng
+                {initialData ? "Sửa kỹ năng" : "Thêm kỹ năng"}
               </h2>
               <p className="text-[12px] text-gray-400 mt-0.5">
                 <span className="text-violet-500">*</span> Thông tin bắt buộc
@@ -103,7 +124,7 @@ export default function AddSkillModal({
             </div>
             <button
               onClick={onClose}
-              disabled={isSaving}
+              disabled={isSaving || isDeleting}
               className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-all"
             >
               <X size={18} />
@@ -143,25 +164,61 @@ export default function AddSkillModal({
 
             <div className="rounded-xl bg-violet-50 text-violet-700 text-[12.5px] px-3 py-2 flex items-center gap-2">
               <BadgeCheck size={14} />
-              Mức độ hiện tại: {SKILL_LEVEL_LABELS[form.level]}
+              Mức độ: {SKILL_LEVEL_LABELS[form.level]}
             </div>
           </div>
 
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 shrink-0 bg-white">
-            <button
-              onClick={onClose}
-              disabled={isSaving}
-              className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
-            >
-              Hủy
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="px-6 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-violet-600 hover:bg-violet-700 active:scale-[0.97] shadow-sm shadow-violet-200 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isSaving ? "Đang lưu..." : "Lưu"}
-            </button>
+          {showDeleteConfirm && initialData && (
+            <div className="px-6 py-4 bg-red-50 border-t border-red-200 text-[13px]">
+              <p className="text-red-900 font-medium mb-3">
+                Bạn có chắc muốn xóa kỹ năng &quot;{initialData.name}&quot; này?
+              </p>
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="px-4 py-2 rounded-full text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 transition-all text-[12.5px] font-medium"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 rounded-full text-white bg-red-500 hover:bg-red-600 transition-all text-[12.5px] font-medium disabled:opacity-60"
+                >
+                  {isDeleting ? "Đang xóa..." : "Xóa"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3 shrink-0 bg-white">
+            {initialData && (
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isSaving || isDeleting || showDeleteConfirm}
+                className="flex items-center gap-2 px-3.5 py-2.5 rounded-full text-[13.5px] font-semibold text-red-600 hover:bg-red-50 transition-all"
+              >
+                <Trash2 size={16} />
+                Xóa
+              </button>
+            )}
+            <div className="flex items-center justify-end gap-3">
+              <button
+                onClick={onClose}
+                disabled={isSaving || isDeleting}
+                className="px-5 py-2.5 rounded-full text-[13.5px] font-semibold text-gray-500 hover:bg-gray-100 transition-all"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving || isDeleting}
+                className="px-6 py-2.5 rounded-full text-[13.5px] font-semibold text-white bg-violet-600 hover:bg-violet-700 active:scale-[0.97] shadow-sm shadow-violet-200 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isSaving ? "Đang lưu..." : initialData ? "Cập nhật" : "Lưu"}
+              </button>
+            </div>
           </div>
         </div>
       </div>

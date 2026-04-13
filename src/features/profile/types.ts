@@ -103,6 +103,11 @@ export interface CreateUserSkillPayload {
   level: number;
 }
 
+export interface UpdateUserSkillPayload {
+  skillId: string;
+  level: number;
+}
+
 export interface CreateEducationPayload {
   schoolId?: string;
   schoolName?: string;

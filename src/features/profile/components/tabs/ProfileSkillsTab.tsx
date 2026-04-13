@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Pencil, Globe, Link2 } from "lucide-react";
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
+import SkillItem from "../shared/SkillItem";
 import SectionHead from "../shared/Sectionhead";
 import AddExperienceModal from "../models/AddExperienceModal/index";
 import {
@@ -11,7 +12,6 @@ import {
   ProfileExperienceView,
   ProfileSkillView,
   ProfileUserView,
-  SKILL_LEVEL_LABELS,
   SkillOptionView,
 } from "../../types";
 import { ExperienceFormData } from "../models/AddExperienceModal/types";
@@ -39,6 +39,10 @@ interface ProfileSkillsTabProps {
   isCreatingUserSkill?: boolean;
   onEditExperience?: (exp: ProfileExperienceView) => void;
   onEditEducation?: (edu: ProfileEducationView) => void;
+  onUpdateUserSkill?: (skillId: string, data: AddSkillFormData) => Promise<void>;
+  isUpdatingUserSkill?: boolean;
+  onDeleteUserSkill?: (skillId: string) => Promise<void>;
+  isDeletingUserSkill?: boolean;
 }
 
 export default function ProfileSkillsTab({
@@ -58,12 +62,17 @@ export default function ProfileSkillsTab({
   isCreatingUserSkill,
   onEditExperience,
   onEditEducation,
+  onUpdateUserSkill,
+  isUpdatingUserSkill,
+  onDeleteUserSkill,
+  isDeletingUserSkill,
 }: ProfileSkillsTabProps) {
   const u = user;
   const [activeSkillCat, setActiveSkillCat] = useState(DEFAULT_CATEGORY);
   const [addExpOpen, setAddExpOpen] = useState(false);
   const [addEduOpen, setAddEduOpen] = useState(false);
   const [addSkillOpen, setAddSkillOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<ProfileSkillView | undefined>();
 
   const skillCategories = useMemo(() => {
     const categories = Array.from(
@@ -90,6 +99,24 @@ export default function ProfileSkillsTab({
 
   const handleAddSkill = async (data: AddSkillFormData) => {
     await onCreateUserSkill(data);
+    setAddSkillOpen(false);
+  };
+
+  const handleEditSkill = (skill: ProfileSkillView) => {
+    setEditingSkill(skill);
+    setAddSkillOpen(true);
+  };
+
+  const handleUpdateSkill = async (data: AddSkillFormData) => {
+    if (!editingSkill) return;
+    await onUpdateUserSkill?.(editingSkill.id, data);
+    setEditingSkill(undefined);
+    setAddSkillOpen(false);
+  };
+
+  const handleDeleteSkill = async (skillId: string) => {
+    await onDeleteUserSkill?.(skillId);
+    setEditingSkill(undefined);
     setAddSkillOpen(false);
   };
 
@@ -176,19 +203,11 @@ export default function ProfileSkillsTab({
                 <p className="text-[13px] text-gray-400">Chưa có kỹ năng.</p>
               )}
               {filtered.map((sk) => (
-                <div
+                <SkillItem
                   key={sk.id}
-                  className="flex items-center justify-between py-2.5 border-b border-gray-100 last:border-b-0"
-                >
-                  <div>
-                    <div className="text-[14px] font-medium text-gray-900">
-                      {sk.name}
-                    </div>
-                    <div className="text-[12px] text-gray-400 mt-0.5">
-                      {sk.category} · {SKILL_LEVEL_LABELS[sk.level]}
-                    </div>
-                  </div>
-                </div>
+                  skill={sk}
+                  onEdit={u.isOwner ? handleEditSkill : undefined}
+                />
               ))}
             </div>
           </section>
@@ -263,10 +282,16 @@ export default function ProfileSkillsTab({
 
       <AddSkillModal
         open={addSkillOpen}
-        onClose={() => setAddSkillOpen(false)}
-        availableSkills={availableSkillsToAdd}
-        isSaving={isCreatingUserSkill}
-        onSave={handleAddSkill}
+        onClose={() => {
+          setAddSkillOpen(false);
+          setEditingSkill(undefined);
+        }}
+        availableSkills={editingSkill ? availableSkillsToAdd.concat([{ id: editingSkill.skillId, name: editingSkill.name, category: editingSkill.category }]) : availableSkillsToAdd}
+        isSaving={isCreatingUserSkill || isUpdatingUserSkill}
+        isDeleting={isDeletingUserSkill}
+        onSave={editingSkill ? handleUpdateSkill : handleAddSkill}
+        onDelete={handleDeleteSkill}
+        initialData={editingSkill}
       />
     </div>
   );

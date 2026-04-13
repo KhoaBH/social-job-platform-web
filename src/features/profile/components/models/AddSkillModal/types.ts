@@ -1,4 +1,4 @@
-import { SkillLevel } from "@/features/profile/types";
+import { SkillLevel, ProfileSkillView } from "@/features/profile/types";
 
 export interface AddSkillFormData {
   skillId: string;
@@ -15,4 +15,7 @@ export interface AddSkillModalProps {
   }>;
   isSaving?: boolean;
   onSave?: (data: AddSkillFormData) => Promise<void>;
+  onDelete?: (skillId: string) => Promise<void>;
+  isDeleting?: boolean;
+  initialData?: ProfileSkillView;
 }

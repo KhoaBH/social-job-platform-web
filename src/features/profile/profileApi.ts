@@ -15,6 +15,7 @@ import {
   CreateEducationPayload,
   UpdateEducationPayload,
   CreateUserSkillPayload,
+  UpdateUserSkillPayload,
 } from "../profile/types";
 
 export const profileApi = appApi.injectEndpoints({
@@ -125,7 +126,7 @@ export const profileApi = appApi.injectEndpoints({
       providesTags: [{ type: "ProfileSkill", id: "SKILL_LIST" }],
     }),
     getUserSkills: builder.query<BackendUserSkill[], string>({
-      query: (userId) => `/skills/user/${userId}`,
+      query: () => `/skills/user`,
       providesTags: (_result, _error, userId) => [
         { type: "ProfileSkill", id: `USER_${userId}` },
       ],
@@ -138,6 +139,30 @@ export const profileApi = appApi.injectEndpoints({
           body,
         }),
         invalidatesTags: [{ type: "ProfileSkill", id: "SKILL_LIST" }],
+      },
+    ),
+    updateUserSkill: builder.mutation<
+      BackendUserSkill,
+      { userId: string; skillId: string; body: UpdateUserSkillPayload }
+    >({
+      query: ({ skillId, body }) => ({
+        url: `/skills/user/${skillId}`,
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: (_result, _error, arg) => [
+        { type: "ProfileSkill", id: `USER_${arg.userId}` },
+      ],
+    }),
+    deleteUserSkill: builder.mutation<void, { userId: string; skillId: string }>(
+      {
+        query: ({ skillId }) => ({
+          url: `/skills/user/${skillId}`,
+          method: "DELETE",
+        }),
+        invalidatesTags: (_result, _error, arg) => [
+          { type: "ProfileSkill", id: `USER_${arg.userId}` },
+        ],
       },
     ),
     getMyFollowing: builder.query<BackendFollow[], void>({
@@ -172,6 +197,8 @@ export const {
   useGetSkillsQuery,
   useGetUserSkillsQuery,
   useCreateUserSkillMutation,
+  useUpdateUserSkillMutation,
+  useDeleteUserSkillMutation,
   useGetMyFollowingQuery,
   useGetMyFollowersQuery,
   useGetMyConnectionsQuery,
