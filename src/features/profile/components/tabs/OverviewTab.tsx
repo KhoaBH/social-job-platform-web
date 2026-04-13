@@ -15,12 +15,12 @@ import {
 import ExperienceItem from "../shared/ExperienceItem";
 import EducationItem from "../shared/EducationItem";
 import SectionHead from "../shared/Sectionhead";
+import SkillItem from "../shared/SkillItem";
 import {
   ProfileEducationView,
   ProfileExperienceView,
   ProfileSkillView,
   ProfileUserView,
-  SKILL_LEVEL_LABELS,
   Tab,
 } from "../../types";
 // import AddExperienceModal from "../models/Addexperiencemodal";
@@ -183,15 +183,12 @@ export default function OverviewTab({
                 <p className="text-[13px] text-gray-400">Chưa có kỹ năng.</p>
               )}
               {skills.slice(0, 6).map((sk) => (
-                <span
-                  key={sk.id}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 text-violet-600 text-[12.5px] font-medium"
-                >
-                  {sk.name}
-                  <span className="bg-violet-600 text-white rounded-full px-1.5 text-[10px] font-bold">
-                    {SKILL_LEVEL_LABELS[sk.level]}
-                  </span>
-                </span>
+                <SkillItem 
+                  key={sk.id} 
+                  skill={sk} 
+                  compact
+                  onEdit={u.isOwner ? () => {} : undefined}
+                />
               ))}
             </div>
           </section>
