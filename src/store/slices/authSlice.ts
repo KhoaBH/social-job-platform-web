@@ -7,15 +7,18 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: typeof window !== "undefined" ? JSON.parse(localStorage.getItem("user") || "null") : null,
-  token: typeof window !== "undefined" ? localStorage.getItem("token") : null,
+  user: null,
+  token: null,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setCredentials: (state, action: PayloadAction<{ user: User; token: string }>) => {
+    setCredentials: (
+      state,
+      action: PayloadAction<{ user: User; token: string }>,
+    ) => {
       state.user = action.payload.user;
       state.token = action.payload.token;
       localStorage.setItem("token", action.payload.token);
@@ -27,8 +30,15 @@ const authSlice = createSlice({
       localStorage.removeItem("token");
       localStorage.removeItem("user");
     },
+    hydrateAuth: (
+      state,
+      action: PayloadAction<{ user: User | null; token: string | null }>,
+    ) => {
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+    },
   },
 });
 
-export const { setCredentials, logout } = authSlice.actions;
+export const { setCredentials, logout, hydrateAuth } = authSlice.actions;
 export default authSlice.reducer;

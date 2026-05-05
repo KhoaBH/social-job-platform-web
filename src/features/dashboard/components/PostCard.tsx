@@ -372,17 +372,14 @@ export default function PostCard({ post }: PostCardProps) {
           <Link
             href={postAuthorProfileHref}
             title="Xem hồ sơ"
-            className="w-11 h-11 rounded-full flex items-center justify-center
-                     text-base font-bold text-white shrink-0 no-underline
-                     transition-transform duration-150 hover:scale-105"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-base font-bold text-white shrink-0 no-underline transition-transform duration-150 hover:scale-105"
             style={{ background: post.avatarColor }}
           >
             {post.avatar}
           </Link>
         ) : (
           <div
-            className="w-11 h-11 rounded-full flex items-center justify-center
-                     text-base font-bold text-white shrink-0"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-base font-bold text-white shrink-0"
             style={{ background: post.avatarColor }}
           >
             {post.avatar}
@@ -406,11 +403,7 @@ export default function PostCard({ post }: PostCardProps) {
             {post.time}
           </div>
         </div>
-        <button
-          className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer
-                     border-none bg-transparent text-[#666]
-                     transition-[background] duration-100 hover:bg-[#F2F2F7]"
-        >
+        <button className="w-8 h-8 rounded-full flex items-center justify-center cursor-pointer border-none bg-transparent text-[#666] transition-[background] duration-100 hover:bg-[#F2F2F7]">
           <MoreHorizontal size={18} />
         </button>
       </div>
@@ -422,10 +415,7 @@ export default function PostCard({ post }: PostCardProps) {
 
       {/* Job badge */}
       {post.isJob && (
-        <div
-          className="mx-4 mb-3 bg-[#EEF3F8] rounded-lg px-3.5 py-2.5
-                        flex items-center gap-2 text-[13px] text-[#0A66C2] font-semibold"
-        >
+        <div className="mx-4 mb-3 bg-[#EEF3F8] rounded-lg px-3.5 py-2.5 flex items-center gap-2 text-[13px] text-[#0A66C2] font-semibold">
           <Briefcase size={16} />
           Bài đăng tuyển dụng · Ứng tuyển ngay
         </div>

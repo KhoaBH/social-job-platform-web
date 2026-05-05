@@ -28,6 +28,8 @@ export default function Navbar({
     setActiveNav(index);
     if (index === 0) {
       router.push(ROUTES.PROTECTED.DASHBOARD);
+    } else if (index === 1) {
+      router.push(ROUTES.PROTECTED.JOBS);
     }
   };
 

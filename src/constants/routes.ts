@@ -15,6 +15,7 @@ export const ROUTES = {
 
   PROTECTED: {
     DASHBOARD: "/dashboard" as const,
+    JOBS: "/jobs" as const,
 
     PROFILE: {
       BASE: "/profile" as const,
@@ -32,10 +33,10 @@ export type StaticRoute =
   | typeof ROUTES.PUBLIC.HOME
   | typeof ROUTES.PUBLIC.LOGIN
   | typeof ROUTES.PROTECTED.DASHBOARD
+  | typeof ROUTES.PROTECTED.JOBS
   | typeof ROUTES.PROTECTED.PROFILE.BASE;
 
-export type DynamicRoute =
-  | `/profile/${string}`;
+export type DynamicRoute = `/profile/${string}`;
 
 export type AppRoute = StaticRoute | DynamicRoute;
 
@@ -47,13 +48,10 @@ export type AppRoute = StaticRoute | DynamicRoute;
  * Check if route is public
  */
 export const isPublicRoute = (pathname: string): boolean => {
-  const publicPaths = [
-    ROUTES.PUBLIC.HOME,
-    ROUTES.PUBLIC.LOGIN,
-  ];
+  const publicPaths = [ROUTES.PUBLIC.HOME, ROUTES.PUBLIC.LOGIN];
 
   return publicPaths.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
   );
 };
 

@@ -36,11 +36,7 @@ export default function LeftSidebar({
         {/* Body */}
         <div className="px-3.5 pb-3.5">
           {/* Avatar */}
-          <div
-            className="w-15 h-15 rounded-full bg-[#0A66C2] flex items-center justify-center
-                          text-xl font-bold text-white border-[3px] border-white
-                          -mt-7.5 mb-2"
-          >
+          <div className="w-15 h-15 rounded-full bg-[#0A66C2] flex items-center justify-center text-xl font-bold text-white border-[3px] border-white -mt-7.5 mb-2">
             {initials(userFullName)}
           </div>
 
@@ -67,10 +63,7 @@ export default function LeftSidebar({
             </div>
           ))}
 
-          <div
-            className="flex items-center gap-1.5 mt-2.5 px-2.5 py-2 bg-[#FEF9EC]
-                          rounded-lg text-[12px] text-[#8A6800] font-semibold cursor-pointer"
-          >
+          <div className="flex items-center gap-1.5 mt-2.5 px-2.5 py-2 bg-[#FEF9EC] rounded-lg text-[12px] text-[#8A6800] font-semibold cursor-pointer">
             <Star size={14} />
             Thử Jub Premium miễn phí
           </div>
@@ -82,10 +75,7 @@ export default function LeftSidebar({
         {shortcuts.map((s, i) => (
           <button
             key={i}
-            className="flex items-center gap-2.5 px-3.5 py-2 text-[13px] text-[#444]
-                       cursor-pointer border-none bg-transparent w-full text-left
-                       font-[inherit] transition-[background] duration-100
-                       hover:bg-[#F2F2F7] hover:text-[#0A66C2]"
+            className="flex items-center gap-2.5 px-3.5 py-2 text-[13px] text-[#444] cursor-pointer border-none bg-transparent w-full text-left font-[inherit] transition-[background] duration-100 hover:bg-[#F2F2F7] hover:text-[#0A66C2]"
           >
             <span>{s.icon}</span>
             {s.label}

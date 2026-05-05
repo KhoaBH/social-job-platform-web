@@ -127,12 +127,10 @@ export default function RightSidebar() {
         {jobSuggestions.map((job, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 px-4 py-2.5 border-t border-[#E4E4E7]
-                       cursor-pointer transition-[background] duration-100 hover:bg-[#F8F8FC]"
+            className="flex items-center gap-3 px-4 py-2.5 border-t border-[#E4E4E7] cursor-pointer transition-[background] duration-100 hover:bg-[#F8F8FC]"
           >
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center
-                         text-base font-extrabold text-white shrink-0"
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-base font-extrabold text-white shrink-0"
               style={{ background: job.color }}
             >
               {job.logo}
@@ -144,12 +142,7 @@ export default function RightSidebar() {
                 {job.salary}/tháng
               </div>
             </div>
-            <button
-              className="text-[12.5px] font-bold px-3.5 py-1.25 rounded-2xl
-                               border-[1.5px] border-[#0A66C2] text-[#0A66C2] bg-transparent
-                               cursor-pointer font-[inherit] shrink-0
-                               transition-all duration-150 hover:bg-[#0A66C2] hover:text-white"
-            >
+            <button className="text-[12.5px] font-bold px-3.5 py-1.25 rounded-2xl border-[1.5px] border-[#0A66C2] text-[#0A66C2] bg-transparent cursor-pointer font-[inherit] shrink-0 transition-all duration-150 hover:bg-[#0A66C2] hover:text-white">
               Nộp CV
             </button>
           </div>
@@ -194,9 +187,7 @@ export default function RightSidebar() {
               <Link
                 href={ROUTES.PROTECTED.PROFILE.VIEW(person.id)}
                 title="Xem hồ sơ"
-                className="w-10 h-10 rounded-full flex items-center justify-center
-                         text-[15px] font-bold text-white shrink-0 no-underline
-                         transition-transform duration-150 hover:scale-105"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-bold text-white shrink-0 no-underline transition-transform duration-150 hover:scale-105"
                 style={{ background: person.color }}
               >
                 {person.avatar}
@@ -244,10 +235,7 @@ export default function RightSidebar() {
               </button>
             </div>
           ))}
-        <div
-          className="flex items-center justify-center gap-1 px-2.5 py-2.5 border-t border-[#E4E4E7]
-                        text-[13px] font-semibold text-[#0A66C2] cursor-pointer hover:bg-[#F2F2F7]"
-        >
+        <div className="flex items-center justify-center gap-1 px-2.5 py-2.5 border-t border-[#E4E4E7] text-[13px] font-semibold text-[#0A66C2] cursor-pointer hover:bg-[#F2F2F7]">
           Xem tất cả <ArrowRight size={14} />
         </div>
       </div>
@@ -260,8 +248,7 @@ export default function RightSidebar() {
         {trendingTopics.map((t, i) => (
           <div
             key={i}
-            className="px-4 py-2 border-t border-[#E4E4E7] cursor-pointer
-                       transition-[background] duration-100 hover:bg-[#F8F8FC]"
+            className="px-4 py-2 border-t border-[#E4E4E7] cursor-pointer transition-[background] duration-100 hover:bg-[#F8F8FC]"
           >
             <div className="text-[13.5px] font-semibold text-[#0A66C2]">
               {t.tag}
