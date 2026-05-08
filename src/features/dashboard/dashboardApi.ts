@@ -1,81 +1,17 @@
 import { appApi } from "@/lib/appApi";
-
-export interface BackendPostAuthor {
-  id: string;
-  email?: string | null;
-  username?: string | null;
-  fullName?: string | null;
-  avatarUrl?: string | null;
-}
-
-export interface BackendPost {
-  id: string;
-  author?: BackendPostAuthor | null;
-  companyId?: string | null;
-  content?: string | null;
-  visibility?: "PUBLIC" | "CONNECTIONS" | "PRIVATE" | string;
-  createdAt?: string | null;
-}
-
-export interface BackendUser {
-  id: string;
-  email?: string | null;
-  username?: string | null;
-  fullName?: string | null;
-  avatarUrl?: string | null;
-  headline?: string | null;
-  profileText?: string | null;
-}
-
-export interface CreatePostPayload {
-  companyId?: string;
-  content: string;
-  visibility: "PUBLIC" | "CONNECTIONS" | "PRIVATE";
-}
-
-export interface SendConnectionRequestPayload {
-  addresseeId: string;
-}
-
-export interface BackendPostInteraction {
-  id: string;
-  postId?: string;
-  userId?: string;
-}
-
-export interface BackendCommentUser {
-  id?: string;
-  fullName?: string | null;
-  username?: string | null;
-  email?: string | null;
-}
-
-export interface BackendPostComment {
-  id: string;
-  content?: string | null;
-  user?: BackendCommentUser | null;
-  createdAt?: string | null;
-}
-
-export interface BackendPostCommentTree {
-  id: string;
-  content?: string | null;
-  username?: string | null;
-  createdAt?: string | null;
-  replies?: BackendPostCommentTree[];
-}
-
-export interface BackendCommentInteraction {
-  id: string;
-  commentId?: string;
-  userId?: string;
-}
-
-export interface CreatePostCommentPayload {
-  postId: string;
-  content: string;
-  parentCommentId?: string;
-}
+import {
+  BackendCommentInteraction,
+  BackendPost,
+  BackendPostComment,
+  BackendPostCommentTree,
+  BackendPostInteraction,
+  BackendUser,
+  CreatePostCommentPayload,
+  CreatePostPayload,
+  FriendRequest,
+  SendConnectionRequestPayload,
+} from "./types";
+import { use } from "react";
 
 export const dashboardApi = appApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -107,6 +43,30 @@ export const dashboardApi = appApi.injectEndpoints({
       }),
       invalidatesTags: (_result, _error, postId) => [
         { type: "PostInteractions", id: postId },
+      ],
+    }),
+    friendRequest: builder.query<FriendRequest[], void>({
+      query: () => "/connections/requests",
+      providesTags: [{ type: "FriendRequests", id: "LIST" }],
+    }),
+    acceptRequest: builder.mutation<void, string>({
+      query: (connectionId) => ({
+        url: `/connections/${connectionId}/accept`,
+        method: "POST",
+      }),
+      invalidatesTags: [
+        { type: "ProfileConnection", id: "ME" },
+        { type: "FriendRequests", id: "LIST" },
+      ],
+    }),
+    rejectRequest: builder.mutation<void, string>({
+      query: (connectionId) => ({
+        url: `/connections/${connectionId}/reject`,
+        method: "POST",
+      }),
+      invalidatesTags: [
+        { type: "ProfileConnection", id: "ME" },
+        { type: "FriendRequests", id: "LIST" },
       ],
     }),
     unlikePost: builder.mutation<void, string>({
@@ -195,4 +155,7 @@ export const {
   useLikeCommentMutation,
   useUnlikeCommentMutation,
   useSendConnectionRequestMutation,
+  useFriendRequestQuery,
+  useAcceptRequestMutation,
+  useRejectRequestMutation,
 } = dashboardApi;

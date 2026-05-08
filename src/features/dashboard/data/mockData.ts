@@ -1,10 +1,4 @@
-import {
-  Bell,
-  Briefcase,
-  Home,
-  MessageCircle,
-  Users,
-} from "lucide-react";
+import { Bell, Briefcase, Home, MessageCircle, Users } from "lucide-react";
 
 export const mockPosts = [
   {
@@ -52,15 +46,51 @@ export const mockPosts = [
 ];
 
 export const suggestedConnections = [
-  { name: "Lê Văn Hùng", role: "DevOps Engineer · AWS", avatar: "H", color: "#F59E0B", mutual: 12 },
-  { name: "Ngô Thanh Hà", role: "UX Designer · Figma", avatar: "H", color: "#EC4899", mutual: 8 },
-  { name: "Đinh Quốc Bảo", role: "Data Engineer · Spark", avatar: "B", color: "#10B981", mutual: 5 },
+  {
+    name: "Lê Văn Hùng",
+    role: "DevOps Engineer · AWS",
+    avatar: "H",
+    color: "#F59E0B",
+    mutual: 12,
+  },
+  {
+    name: "Ngô Thanh Hà",
+    role: "UX Designer · Figma",
+    avatar: "H",
+    color: "#EC4899",
+    mutual: 8,
+  },
+  {
+    name: "Đinh Quốc Bảo",
+    role: "Data Engineer · Spark",
+    avatar: "B",
+    color: "#10B981",
+    mutual: 5,
+  },
 ];
 
 export const jobSuggestions = [
-  { title: "Frontend Developer", company: "Shopee", salary: "30–50tr", logo: "S", color: "#EE4D2D" },
-  { title: "React Native Dev", company: "VNG", salary: "35–55tr", logo: "V", color: "#0066FF" },
-  { title: "UI/UX Designer", company: "Zalo", salary: "25–40tr", logo: "Z", color: "#0068FF" },
+  {
+    title: "Frontend Developer",
+    company: "Shopee",
+    salary: "30–50tr",
+    logo: "S",
+    color: "#EE4D2D",
+  },
+  {
+    title: "React Native Dev",
+    company: "VNG",
+    salary: "35–55tr",
+    logo: "V",
+    color: "#0066FF",
+  },
+  {
+    title: "UI/UX Designer",
+    company: "Zalo",
+    salary: "25–40tr",
+    logo: "Z",
+    color: "#0068FF",
+  },
 ];
 
 export const navLinks = [
@@ -69,6 +99,12 @@ export const navLinks = [
   { label: "Mạng lưới", icon: Users },
   { label: "Tin nhắn", icon: MessageCircle },
   { label: "Thông báo", icon: Bell },
+];
+
+export const friendRequestNotifications = [
+  { name: "Lê Văn Hùng", mutualFriends: 12 },
+  { name: "Ngô Thanh Hà", mutualFriends: 8 },
+  { name: "Đinh Quốc Bảo", mutualFriends: 5 },
 ];
 
 export const trendingTopics = [
